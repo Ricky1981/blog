@@ -1,0 +1,417 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://ricky1981.github.io/blog/theme/pygments/github.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/font-awesome/css/solid.css">
+
+
+
+
+
+
+
+<meta name="author" content="Seb" />
+<meta name="description" content="Comment installer les différents outils localement ?" />
+<meta name="keywords" content="projet, OpenClassRooms, GitLab">
+
+
+<meta property="og:site_name" content="Mon Blog Freelance"/>
+<meta property="og:title" content="HowTo"/>
+<meta property="og:description" content="Comment installer les différents outils localement ?"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://ricky1981.github.io/blog/howto.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2020-12-11 00:00:00+01:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://ricky1981.github.io/blog/author/seb.html">
+<meta property="article:section" content="HowTo"/>
+<meta property="article:tag" content="projet"/>
+<meta property="article:tag" content="OpenClassRooms"/>
+<meta property="article:tag" content="GitLab"/>
+<meta property="og:image" content="">
+
+  <title>Mon Blog Freelance &ndash; HowTo</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://ricky1981.github.io/blog">
+        <img src="https://ricky1981.github.io/blog/theme/img/profile.png" alt="Mon Blog Freelance" title="Mon Blog Freelance">
+      </a>
+
+      <h1>
+        <a href="https://ricky1981.github.io/blog">Mon Blog Freelance</a>
+      </h1>
+
+<p>Le début de ma future aventure DevOps!!!</p>
+
+      <nav>
+        <ul class="list">
+
+
+
+            <li>
+              <a target="_self" href="https://getpelican.com/" >Pelican</a>
+            </li>
+            <li>
+              <a target="_self" href="https://docs.gitlab.com/omnibus/docker/" >GitLab Docker</a>
+            </li>
+            <li>
+              <a target="_self" href="https://openclassrooms.com/fr/paths/100/projects/447/assignment" >Projet 04</a>
+            </li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/Ricky1981" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/sebastien-rykala-7767b81ba/" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://ricky1981.github.io/blog">Home</a>
+
+      <a href="archives.html">Archives</a>
+      <a href="categories.html">Categories</a>
+      <a href="tags.html">Tags</a>
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="howto">HowTo</h1>
+    <p>
+      Posted on Fri 11 December 2020 in <a href="https://ricky1981.github.io/blog/category/howto.html">HowTo</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <h1>Table des Matières <a name="sommaire"></a></h1>
+<ol>
+<li><a href="#prerequis">Prérequis</a></li>
+<li><a href="#gitlabinstall">Installation de Giltab</a><ul>
+<li><a href="#gitlabbase">Les bases</a></li>
+<li><a href="#certificat">Les certificats</a></li>
+<li><a href="#runner">Le Runner</a></li>
+</ul>
+</li>
+<li><a href="#pelicaninstall">Installation de Pelican</a></li>
+<li><a href="#githubPages">Configurer GitHub Pages</a></li>
+<li><a href="#CI/CD">Chaîne de livraison continue</a><ul>
+<li><a href="#yml">.gitlab-ci.yml</a></li>
+<li><a href="#cicdvisu">visualisation</a></li>
+</ul>
+</li>
+<li><a href="#push">Push vers notre repository GitLab</a></li>
+<li><a href="#githubverif">Verification dans GitHub Pages</a></li>
+<li><a href="#annexe">Annexe</a></li>
+</ol>
+<h2>Prérequis <a name="prerequis"></a></h2>
+<p>Comme à chaque fois, un minimum de prérequis est à respecter!
+Ici, il faut les bases pour l'utilisation d'un VagrantFile.
+Pour le reste, une grande partie est automatisé car directement configuré dans le VagrantFile.</p>
+<p><a href="#sommaire">Revenir au sommaire</a></p>
+<h2>Installation de Giltab <a name="gitlabinstall"></a></h2>
+<h3>Les bases <a name="gitlabbase"></a></h3>
+<ol>
+<li>Lancer vagrant via la commande <code>vagrant up</code></li>
+<li>Lorsque l'installation et la configuration de la machine virtuelle est terminée, se connecter en SSH dessus via la commande <code>vagrant ssh</code></li>
+<li>Une fois sur la VM, on lance juste la commande suivante : <code>docker-compose up –d</code>.
+Cette commande utilise donc Docker Compose pour installer Gitlab-ee ainsi que le Gitlab-runner dont nous aurons besoin pour nous chaine de livraison.</li>
+<li>Une fois l'installation terminée, il faut attendre un certain temps (environ 15 minutes) car le lancement de l'ensemble des services de GitLab est long. Mais au bout d'un moment, le lien https://gitlab.devops.oc devrait fonctionner! </li>
+</ol>
+<p><a href="#sommaire">Revenir au sommaire</a></p>
+<h3>La configuration du certificat <a name="certificat"></a></h3>
+<p>Grande partie!!! Pas facile d'héberger un site en local...
+Mais en suivant les étapes suivantes, tout se passera bien :</p>
+<ol>
+<li>Rentrer dans le conteneur gitlab-runner via la commande : <code>docker exec -ti gitlab-runner bash</code></li>
+<li>Créer le repertoire suivant : <code>mkdir -p /etc/gitlab-runner/certs</code></li>
+<li>Se placer dans ce repertoire : <code>cd /etc/gitlab-runner/certs</code></li>
+<li>Créer les clés privés et publiques : </li>
+</ol>
+<div class="highlight"><pre><span></span><code>openssl req -x509 -out gitlab.devops.oc.crt -keyout gitlab.devops.oc.key -newkey rsa:2048 -nodes -sha256 -subj <span class="s1">&#39;/CN=gitlab.devops.oc&#39;</span> -extensions EXT -config &lt;<span class="o">(</span> <span class="nb">printf</span> <span class="s2">&quot;[dn]\nCN=gitlab.devops.oc\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:gitlab.devops.oc\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth&quot;</span><span class="o">)</span>
+</code></pre></div>
+
+
+<ol>
+<li>Sortir du conteneur puis sur la VM lancer les commandes suivantes :</li>
+</ol>
+<div class="highlight"><pre><span></span><code>vagrant@devops:~$ <span class="nb">cd</span> /srv/gitlab-runner/config/certs/ 
+
+vagrant@devops:/srv/gitlab-runner/config/certs$ sudo cp -a gitlab.devops.oc.* /srv/gitlab/config/ssl/ 
+
+vagrant@devops:/srv/gitlab-runner/config/certs$ sudo vim /srv/gitlab/config/gitlab.rb 
+</code></pre></div>
+
+
+<ol>
+<li>Ajouter à la fin du fichier gitlab.rb la commande suivante : <code>registry_external_url 'https://gitlab.devops.oc'</code></li>
+<li>Allons dans le conteneur gitlab-ee : <code>docker exec -ti gitlab-ee bash</code></li>
+<li>Puis nous lançons une reconfiguration : <code>gitlab-ctl reconfigure</code></li>
+</ol>
+<p><a href="#sommaire">Revenir au sommaire</a></p>
+<h3>Installation du runner <a name="runner"></a></h3>
+<p>Une fois la partie précédent réalsiée, nous relançons le runner en ajoutant un agent :</p>
+<div class="highlight"><pre><span></span><code>vagrant@devops:/srv/gitlab-runner/config/certs$ docker <span class="nb">exec</span> -ti gitlab-runner bash 
+
+root@00de709eafcf:/# gitlab-runner restart
+root@00de709eafcf:/# gitlab-runner register 
+
+Runtime platform                                    <span class="nv">arch</span><span class="o">=</span>amd64 <span class="nv">os</span><span class="o">=</span>linux <span class="nv">pid</span><span class="o">=</span><span class="m">123</span> <span class="nv">revision</span><span class="o">=</span>8fa89735 <span class="nv">version</span><span class="o">=</span><span class="m">13</span>.6.0 
+
+Running in system-mode.                      
+
+Enter the GitLab instance URL <span class="o">(</span><span class="k">for</span> example, https://gitlab.com/<span class="o">)</span>: https://gitlab.devops.oc/ 
+
+Enter the registration token: 1aCQdeqcRVdgSbE55PyC 
+
+Enter a description <span class="k">for</span> the runner: 
+
+<span class="o">[</span>00de709eafcf<span class="o">]</span>: GitHub Pages 
+
+Enter tags <span class="k">for</span> the runner <span class="o">(</span>comma-separated<span class="o">)</span>: 
+
+Registering runner... succeeded                     <span class="nv">runner</span><span class="o">=</span>1aCQdeqc 
+
+Enter an executor: docker, docker-ssh, shell, ssh, docker+machine, custom, virtualbox, docker-ssh+machine, kubernetes, parallels: 
+docker 
+
+Enter the default Docker image <span class="o">(</span><span class="k">for</span> example, ruby:2.6<span class="o">)</span>: 
+docker:stable 
+
+Runner registered successfully. 
+</code></pre></div>
+
+
+<p>Nous pouvons voir le résultat directement sur notre site GitLab dans les paramètres CI/CD, Section "Runner"</p>
+<p><img alt="Runner Image" src="imagesperso/Runner01.png"></p>
+<p><a href="#sommaire">Revenir au sommaire</a></p>
+<h2>Installation de Pelican <a name="pelicaninstall"></a></h2>
+<ol>
+<li>Lancer la VM via la commande <code>vagrant ssh</code></li>
+<li>Une fois sur la VM, on active l'environnement virtuel de pelican via la commande <code>activateenv</code></li>
+<li>Puis nous generons la configuration de notre site via l’outils quickstart de Pelican : <code>pelican-quickstart</code></li>
+<li>Nous renseignons les différents champs :</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="o">(</span>pelican<span class="o">)</span> vagrant@devops:~/virtualenvs/pelican/freelanceBlog$ pelican-quickstart   
+
+This script will <span class="nb">help</span> you create a new Pelican-based website. 
+
+Please answer the following questions so this script can generate the files needed by Pelican. 
+
+&gt; Where <span class="k">do</span> you want to create your new web site? <span class="o">[</span>.<span class="o">]</span>  
+&gt; What will be the title of this web site? Mon Blog Freelance 
+&gt; Who will be the author of this web site? Seb 
+&gt; What will be the default language of this web site? <span class="o">[</span>fr<span class="o">]</span>  
+&gt; Do you want to specify a URL prefix? e.g., https://example.com   <span class="o">(</span>Y/n<span class="o">)</span>  
+&gt; What is your URL prefix? <span class="o">(</span>see above example<span class="p">;</span> no trailing slash<span class="o">)</span> http://pelican.devops.oc 
+&gt; Do you want to <span class="nb">enable</span> article pagination? <span class="o">(</span>Y/n<span class="o">)</span>  
+&gt; How many articles per page <span class="k">do</span> you want? <span class="o">[</span><span class="m">10</span><span class="o">]</span>  
+&gt; What is your <span class="nb">time</span> zone? <span class="o">[</span>Europe/Paris<span class="o">]</span>  
+&gt; Do you want to generate a tasks.py/Makefile to automate generation and publishing? <span class="o">(</span>Y/n<span class="o">)</span>  
+&gt; Do you want to upload your website using FTP? <span class="o">(</span>y/N<span class="o">)</span>  
+&gt; Do you want to upload your website using SSH? <span class="o">(</span>y/N<span class="o">)</span>  
+&gt; Do you want to upload your website using Dropbox? <span class="o">(</span>y/N<span class="o">)</span>  
+&gt; Do you want to upload your website using S3? <span class="o">(</span>y/N<span class="o">)</span>  
+&gt; Do you want to upload your website using Rackspace Cloud Files? <span class="o">(</span>y/N<span class="o">)</span>  
+&gt; Do you want to upload your website using GitHub Pages? <span class="o">(</span>y/N<span class="o">)</span>  
+
+Done. Your new project is available at /home/vagrant/virtualenvs/pelican/freelanceBlog 
+</code></pre></div>
+
+
+<ol>
+<li>Puis nous lançons notre site : <code>pelican --autoreload -b 192.168.33.10 --listen</code></li>
+<li>Enfin, on peut le lancer : <code>http://pelican.devops.oc:8000/</code></li>
+<li>Pour le reste, il suffit de rédiger vos articles en MarkDown dans le repertoire content</li>
+<li>Nous pouvons ensuite parametrer notre GitHub Pages</li>
+</ol>
+<p><a href="#sommaire">Revenir au sommaire</a></p>
+<h2>Configurer GitHub Pages <a name="githubPages"></a></h2>
+<p>Avant de mettre en place la chaine de livraison, nous allons configurer GitHub afin de pouvoir utiliser un nouveau repository en tant que "Blog"</p>
+<p>Pour celà, rien de bien compliquer :</p>
+<ol>
+<li>Se connecter sur son compte GitHub</li>
+<li>Créer un nouveau projet que nous appelerons "Blog"</li>
+<li>Allez dans les paramètres de la repository et allez dans la section "GitHub Pages"</li>
+<li>Choisir une branche ainsi qu'un repertoire sur lequel le site pointera</li>
+<li>Sauvegarder</li>
+</ol>
+<p><a href="#sommaire">Revenir au sommaire</a></p>
+<h2>La chaîne de livraison continue <a name="CI/CD"></a></h2>
+<h3>Le fichier .gitlab-ci.yml <a name="yml"></a></h3>
+<p>C'est grâce à ce fichier intitulé ".gitlab-ci.yml" que la CI/CD sur GitLab peut fonctionner. Ce fichier doit être placé à la racine du projet. C'est ici que nous définirons notre pipeline.</p>
+<p>Penser par contre à suivre la procédure décrite sur gitlab pour pouvoir pusher via une clé <a href="https://docs.gitlab.com/ee/ci/ssh_keys/#ssh-keys-when-using-the-shell-executor">ssh</a> sur GitHub à savoir :</p>
+<ol>
+<li>Recupèrer la clé privé de notre VM que nous plaçons dans une variable GitLab</li>
+<li>Copier la clé publique dans GitHub</li>
+</ol>
+<h3>Visualiser la chaîne <a name="cicdvisu"></a></h3>
+<p>La chaîne de deploiement est visible dans le menu "CI/CD", partie "Pipelines". Dans notre cas, seul deux jobs seront executés et donc visible dans GitLab.
+- Un job qui nous permettra de tester que l'application Pelican parvient à generer les fichier html par rapport aux Articles en MarkDown que nous avons rédigé.
+- Un jod de déploiement qui nous permettra de pousser tous les fichiers html dont GitHub Pages à besoin pour fonctionner sur la bonne branche.</p>
+<p><img alt="CICD01 Image" src="imagesperso/CICD01.png"></p>
+<p><a href="#sommaire">Revenir au sommaire</a></p>
+<h2>Push vers notre repository GitLab <a name="push"></a></h2>
+<p>Tout d'abord, sur notre VM, nous allons créer notre clé SSH afin de pouvoir l'interconnecter avec GitLab.
+Pour celà :</p>
+<div class="highlight"><pre><span></span><code>vagrant@devops:~/virtualenvs/pelican/freelanceBlog$ ssh-keygen -t rsa -b <span class="m">4096</span> -C <span class="s2">&quot;Seb&quot;</span>  
+
+Generating public/private rsa key pair. 
+Enter file in which to save the key <span class="o">(</span>/home/vagrant/.ssh/id_rsa<span class="o">)</span>:  
+Enter passphrase <span class="o">(</span>empty <span class="k">for</span> no passphrase<span class="o">)</span>:  
+Enter same passphrase again:  
+Your identification has been saved in /home/vagrant/.ssh/id_rsa. 
+Your public key has been saved in /home/vagrant/.ssh/id_rsa.pub. 
+The key fingerprint is: 
+SHA256:V1Lnvze2GRM1waYUvI4V/mu4v8kD4D11f9LV7RRVCjQ Seb 
+</code></pre></div>
+
+
+<p>Etant donné que nous avons fait une redirection du port SSH dans notre conteneur, il faut le faire comprendre à SSH. </p>
+<p>Pour cela, on crée le fichier ~/.ssh/config et on y renseigne les informations suivantes : </p>
+<div class="highlight"><pre><span></span><code>Host gitlab.devops.oc 
+Hostname gitlab.devops.oc 
+PreferredAuthentications publickey 
+IdentityFile ~/.ssh/id_rsa 
+Port <span class="m">5822</span> 
+</code></pre></div>
+
+
+<p>Ensuite, nous ajoutons notre clé public dans GitLab.
+Quand cela est fait, nous pouvons réaliser le remote sur notre repository et pousser les fichiers que nous souhaitons (penser préalablement au .gitignore)</p>
+<p><a href="#sommaire">Revenir au sommaire</a></p>
+<h2>Vérification dans GitHub Pages <a name="githubverif"></a></h2>
+<p>Il suffit de se rendre sur la page https://ricky1981.github.io/blog/ (mais normalement on y est déjà car nous sommes en train de lire l'article...)</p>
+<p><a href="#sommaire">Revenir au sommaire</a></p>
+<h2>Annexe <a name="annexe"></a></h2>
+<h3>Pelican</h3>
+<h4>Image</h4>
+<p>Si vous souhaitez mettre des images dans vos articles, voici la procédure à suivre :</p>
+<ol>
+<li>Créer un dossier images dans le dossier content : <code>mkdir -p ~/virtualenvs/pelican/freelanceBlog/content/images</code></li>
+<li>Ajouter une ligne de configuration dans le fichier pelicanconf.py . Cette ligne sera STATIC_PATHS = ['images'] . </li>
+<li>Utiliser la syntaxe suivante pour insérer l’image <img alt="Mon image" src="/images/mon-image.png"> . </li>
+<li>Pour le transfert de l'image entre la machine locale et la VM, la commande <code>vagrant scp</code>peut être utilisée.</li>
+</ol>
+<p><a href="#sommaire">Revenir au sommaire</a></p>
+<h4>Thèmes</h4>
+<ol>
+<li>mkdir -p ~/virtualenvs/pelican/pelicanThemes</li>
+<li>git clone --recursive https://github.com/alexandrevicenzi/Flex.git</li>
+<li>cd ~/virtualenvs/pelican/pelicanThemes/pelican-themes/</li>
+<li>pelican-themes -vi Flex</li>
+<li>pelican-themes -v -l --&gt; pour voir les thèmes installés</li>
+<li>Et on edite le fichier pelicanconf.py pour rajouter le theme :</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*- #</span>
+
+<span class="nv">AUTHOR</span> <span class="o">=</span> <span class="s1">&#39;Seb&#39;</span>
+<span class="nv">SITENAME</span> <span class="o">=</span> <span class="s1">&#39;Mon Blog Freelance&#39;</span>
+<span class="nv">SITEURL</span> <span class="o">=</span> <span class="s1">&#39;https://ricky1981.github.io/blog/&#39;</span>
+
+<span class="nv">PATH</span> <span class="o">=</span> <span class="s1">&#39;content&#39;</span>
+
+<span class="nv">TIMEZONE</span> <span class="o">=</span> <span class="s1">&#39;Europe/Paris&#39;</span>
+
+<span class="nv">DEFAULT_LANG</span> <span class="o">=</span> <span class="s1">&#39;fr&#39;</span>
+
+<span class="nv">STATIC_PATHS</span> <span class="o">=</span> <span class="o">[</span><span class="s1">&#39;imagesperso&#39;</span><span class="o">]</span>
+<span class="nv">THEME</span> <span class="o">=</span> <span class="s1">&#39;Flex&#39;</span>
+
+<span class="c1"># Feed generation is usually not desired when developing</span>
+<span class="nv">FEED_ALL_ATOM</span> <span class="o">=</span> None
+<span class="nv">CATEGORY_FEED_ATOM</span> <span class="o">=</span> None
+<span class="nv">TRANSLATION_FEED_ATOM</span> <span class="o">=</span> None
+<span class="nv">AUTHOR_FEED_ATOM</span> <span class="o">=</span> None
+<span class="nv">AUTHOR_FEED_RSS</span> <span class="o">=</span> None
+
+<span class="c1"># Blogroll</span>
+<span class="nv">LINKS</span> <span class="o">=</span> <span class="o">((</span><span class="s1">&#39;Pelican&#39;</span>, <span class="s1">&#39;https://getpelican.com/&#39;</span><span class="o">)</span>,
+         <span class="o">(</span><span class="s1">&#39;GitLab Docker&#39;</span>, <span class="s1">&#39;https://docs.gitlab.com/omnibus/docker/&#39;</span><span class="o">)</span>,
+         <span class="o">(</span><span class="s1">&#39;Projet 04&#39;</span>, <span class="s1">&#39;https://openclassrooms.com/fr/paths/100/projects/447/assignment&#39;</span><span class="o">)</span>,<span class="o">)</span>
+
+<span class="c1"># Social widget</span>
+<span class="nv">SOCIAL</span> <span class="o">=</span> <span class="o">((</span><span class="s1">&#39;Linkedin&#39;</span>, <span class="s1">&#39;https://www.linkedin.com/in/sebastien-rykala-7767b81ba/&#39;</span><span class="o">)</span>,<span class="o">)</span>
+
+<span class="nv">DEFAULT_PAGINATION</span> <span class="o">=</span> <span class="m">10</span>
+</code></pre></div>
+
+
+<ol>
+<li>Pour éviter un problème avec l'image du site (Logo OC me concernant), remplacer directement l'image dans /home/vagrant/.local/lib/python3.7/site-packages/pelican/themes/Flex/static/img/profile.png avant de faire un commit.</li>
+</ol>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://ricky1981.github.io/blog/tag/projet.html">projet</a>
+      <a href="https://ricky1981.github.io/blog/tag/openclassrooms.html">OpenClassRooms</a>
+      <a href="https://ricky1981.github.io/blog/tag/gitlab.html">GitLab</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>&copy; 2020 Test Copyright</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Mon Blog Freelance ",
+  "url" : "https://ricky1981.github.io/blog",
+  "image": "",
+  "description": ""
+}
+</script>
+
+
+</body>
+</html>
