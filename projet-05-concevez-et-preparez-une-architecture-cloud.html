@@ -27,16 +27,27 @@
 
 
 
-    <meta name="author" content="Seb" />
-    <meta name="description" content="" />
-<meta property="og:site_name" content="Mon Blog Freelance"/>
-<meta property="og:type" content="blog"/>
-<meta property="og:title" content="Mon Blog Freelance"/>
-<meta property="og:description" content=""/>
-<meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://ricky1981.github.io/blog"/>
+<meta name="author" content="Seb" />
+<meta name="description" content="Découverte du Cloud AWS" />
+<meta name="keywords" content="projet, OpenClassRooms, CI/CD">
 
-  <title>Mon Blog Freelance &ndash; Tags</title>
+
+<meta property="og:site_name" content="Mon Blog Freelance"/>
+<meta property="og:title" content="Projet 05 - Concevez et préparez une architecture cloud"/>
+<meta property="og:description" content="Découverte du Cloud AWS"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://ricky1981.github.io/blog/projet-05-concevez-et-preparez-une-architecture-cloud.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2020-12-11 00:00:00+01:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://ricky1981.github.io/blog/author/seb.html">
+<meta property="article:section" content="Accueil"/>
+<meta property="article:tag" content="projet"/>
+<meta property="article:tag" content="OpenClassRooms"/>
+<meta property="article:tag" content="CI/CD"/>
+<meta property="og:image" content="">
+
+  <title>Mon Blog Freelance &ndash; Projet 05 - Concevez et préparez une architecture cloud</title>
 
 </head>
 <body class="light-theme">
@@ -98,17 +109,96 @@
 
 <article class="single">
   <header>
-    <h1 id="tags">Tags</h1>
+      
+    <h1 id="projet-05-concevez-et-preparez-une-architecture-cloud">Projet 05 - Concevez et préparez une architecture cloud</h1>
+    <p>
+      Posted on Fri 11 December 2020 in <a href="https://ricky1981.github.io/blog/category/accueil.html">Accueil</a>
+
+    </p>
   </header>
+
+
   <div>
-    <ul class="list">          <li><a href="https://ricky1981.github.io/blog/tag/cicd.html">CI/CD</a> (2)</li>
-          <li><a href="https://ricky1981.github.io/blog/tag/docker.html">docker</a> (1)</li>
-          <li><a href="https://ricky1981.github.io/blog/tag/gitlab.html">GitLab</a> (1)</li>
-          <li><a href="https://ricky1981.github.io/blog/tag/openclassrooms.html">OpenClassRooms</a> (4)</li>
-          <li><a href="https://ricky1981.github.io/blog/tag/projet.html">projet</a> (4)</li>
-          <li><a href="https://ricky1981.github.io/blog/tag/vagrant.html">vagrant</a> (1)</li>
-    </ul>
+    <p>Le but de ce projet est de migrer une architecture existante dans le cloud AWS.
+Ici, le but est vraiment d'étudier les services de base que AWS nous présente et de proposer une méthode de migration dans le cloud.
+Nous partirons ici sur une migration dite "lift and shift".</p>
+<h1>Présentation de l'architecture existante</h1>
+<p>Voici le schéma d'architecture à migrer dans le Cloud :</p>
+<p><img alt="DAT001" src="imagesperso/projet05/DAT001.png"></p>
+<p>Avec la plateforme technique suivante :</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>OS/Plateforme</th>
+<th>Logiciel</th>
+<th>Spécifications</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WebFront</td>
+<td><code>Linux / Ubuntu 16.04LTS</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>- NodeJS v8.9.4</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>- PM2 2.9.3</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>4C/8T</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>16Go RAM</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>100Go SSD</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Ansible</td>
+<td><code>ansible --version</code></td>
+<td>ansible 2.9.15</td>
+<td>sdf</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td><code>docker --version</code></td>
+<td>Docker version 19.03.14</td>
+<td>dsg</td>
+</tr>
+</tbody>
+</table>
   </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://ricky1981.github.io/blog/tag/projet.html">projet</a>
+      <a href="https://ricky1981.github.io/blog/tag/openclassrooms.html">OpenClassRooms</a>
+      <a href="https://ricky1981.github.io/blog/tag/cicd.html">CI/CD</a>
+    </p>
+  </div>
+
+
+
+
+
 </article>
 
     <footer>
