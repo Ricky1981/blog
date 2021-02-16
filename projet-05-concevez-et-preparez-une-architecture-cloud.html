@@ -181,26 +181,22 @@ Nous ne partirons donc pas dans cette premiere version sur du Route53, CloudFron
 <ul>
 <li>Pour les instances EC2 :<ul>
 <li>Installation complète à faire​</li>
-<li>Backup à réaliser<ul>
+<li>Backup à réaliser</li>
 <li>Mise à jour des différents logiciels​  </li>
 </ul>
 </li>
 </ul>
-</li>
-</ul>
-<p>​&gt; Pour RDS MySQL :​  </p>
-<blockquote>
-<blockquote>
-<p>Pas d’installation MySQL à réaliser​<br>
-  - Mise à jour du logiciel réalisée par AWS​<br>
-  - Sauvegarde automatique tous les jours sur les 7 derniers jours​<br>
-  - Restauration possible à la seconde près​  </p>
-</blockquote>
-</blockquote>
+<p>​- Pour RDS MySQL :​<br>
+    - Pas d’installation MySQL à réaliser​<br>
+    - Mise à jour du logiciel réalisée par AWS​<br>
+    - Sauvegarde automatique tous les jours sur les 7 derniers jours​<br>
+    - Restauration possible à la seconde près​  </p>
 <ul>
-<li>Pour les services Managé (EKS / ElasticSearch Services) :​  </li>
+<li>Pour les services Managé (EKS / ElasticSearch Services) :​  <ul>
 <li>Backup non nécessaire​  </li>
 <li>Patch de sécurité transparent  </li>
+</ul>
+</li>
 </ul>
 <h2>Plan de migration proposée (la plus simple)</h2>
 <p>Nous partons ici sur une migration dites à froid car c'est la plus simple à gérer même si nous aurions pu envisager une méthode de type blue/green</p>
@@ -211,13 +207,17 @@ Nous ne partirons donc pas dans cette premiere version sur du Route53, CloudFron
 <li>Transfert des données​  </li>
 <li>Test de l’application​  </li>
 <li>Synchronisation des données quotidiennes jusqu’au jour de la migration​  </li>
-<li>Jour J : ​ </li>
+<li>Jour J : ​ <ul>
 <li>Coupure de service de l’ancienne infrastructure​  </li>
 <li>Dernière synchronisation des données​  </li>
 <li>Bascule DNS sur les nouvelles Ips​  </li>
-<li>Tests de l’ensemble des fonctionnalités sur AWS :​  </li>
+<li>Tests de l’ensemble des fonctionnalités sur AWS :​  <ul>
 <li>Si OK : Ouverture du service sur AWS pour les clients​  </li>
 <li>Si KO : Rollback DNS et Réouverture du service sur l’ancienne infrastructure pour les clients  </li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
   </div>
   <div class="tag-cloud">
