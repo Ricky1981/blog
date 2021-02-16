@@ -658,7 +658,7 @@ deployer@recette:/home/vagrant$
   <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">debian:buster-slim</span>
   <span class="nt">stage</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">test</span>
   <span class="nt">script</span><span class="p">:</span>
-    <span class="c1"># On lance l&#39;&#39;&#39;installation des packages nécessaires toujours pour être iso à l&#39;&#39;&#39;&#39;environnement de Sergio</span>
+    <span class="c1"># On lance l&#39;installation des packages nécessaires toujours pour être iso à l&#39;environnement de Sergio</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">apt-get update</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">apt -y install rsync wget unzip lsb-release apt-transport-https ca-certificates</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg</span>
@@ -676,7 +676,7 @@ deployer@recette:/home/vagrant$
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">export SYMFONY_DEPRECATIONS_HELPER=disabled</span>
     <span class="c1"># On test la qualité de notre code</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./bin/phpunit</span> 
-    <span class="c1"># Puis on crée l`&#39;`artefact qui contiendra l&#39;&#39;&#39;ensemble des fichiers necessaires au fonctionnement de notre site</span>
+    <span class="c1"># Puis on crée l&#39;artefact qui contiendra l&#39;ensemble des fichiers necessaires au fonctionnement de notre site</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">rsync -av . --exclude &#39;Dockerfile&#39; codequality-results/</span>
   <span class="nt">artifacts</span><span class="p">:</span>
     <span class="nt">paths</span><span class="p">:</span>
@@ -685,15 +685,15 @@ deployer@recette:/home/vagrant$
 <span class="nt">image_job</span><span class="p">:</span>
   <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">docker:latest</span>
   <span class="nt">stage</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">build</span>
-  <span class="c1"># Appel de la dépendance afin de pouvoir utiliser l&#39;&#39;&#39;artefact construit précédemment</span>
+  <span class="c1"># Appel de la dépendance afin de pouvoir utiliser l&#39;artefact construit précédemment</span>
   <span class="nt">dependencies</span><span class="p">:</span> 
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">build_job</span>
   <span class="nt">script</span><span class="p">:</span>
-    <span class="c1"># On construit notre image docker en utilisant l\&#39;artefact précédemment crée</span>
+    <span class="c1"># On construit notre image docker en utilisant l&#39;artefact précédemment crée</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">docker build --build-arg ARTIFACT_NAME=&quot;codequality-results/&quot; -t $TAG_COMMIT .</span>
     <span class="c1"># On se connecte à notre registry</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY</span>
-    <span class="c1"># Et on pousse notre image docker dans notre registry afin de pouvoir l\&#39;utiliser par la suite</span>
+    <span class="c1"># Et on pousse notre image docker dans notre registry afin de pouvoir l&#39;utiliser par la suite</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">docker push $TAG_COMMIT</span>
 
 <span class="nt">deploy_staging</span><span class="p">:</span>
@@ -704,7 +704,7 @@ deployer@recette:/home/vagrant$
     <span class="c1">#On retire les permissions de tout le monde sauf pour le propriétaire de la clé privée. Prérequis necessaire pour éviter que SSH ne refuse de travailler avec cette clé</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">chmod og= $ID_RSA_RECETTE</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">apk update &amp;&amp; apk add openssh-client</span>
-    <span class="c1"># On demande d\&#39;utiliser le fichier de la clé privée (variable ID_RSA_RECETTE crée de type fichier) et d&#39;ajouter automatiquement de nouvelles clés d’hôte aux fichiers hôtes connus (StrictHostKeyChecking=no)</span>
+    <span class="c1"># On demande d&#39;utiliser le fichier de la clé privée (variable ID_RSA_RECETTE crée de type fichier) et d&#39;ajouter automatiquement de nouvelles clés d’hôte aux fichiers hôtes connus (StrictHostKeyChecking=no)</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ssh -i $ID_RSA_RECETTE -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP_RECETTE &quot;docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY&quot;</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ssh -i $ID_RSA_RECETTE -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP_RECETTE &quot;docker pull $TAG_COMMIT&quot;</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ssh -i $ID_RSA_RECETTE -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP_RECETTE &quot;docker container rm -f testSRY || true&quot;</span>
@@ -728,7 +728,7 @@ deployer@recette:/home/vagrant$
   <span class="nt">environment</span><span class="p">:</span>
     <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Production</span>
     <span class="nt">url</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">http://production.devops.oc:8082/</span>
-  <span class="c1"># Le \&quot;when\&quot; permet d\&#39;indiquer que nous souhaitons valider humainement avant livraison en production</span>
+  <span class="c1"># Le &quot;when&quot; permet d&#39;indiquer que nous souhaitons valider humainement avant livraison en production</span>
   <span class="nt">when</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">manual</span>
   <span class="nt">only</span><span class="p">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">master</span>
