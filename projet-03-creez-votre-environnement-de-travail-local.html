@@ -128,6 +128,7 @@ C'est pourquoi il est important de pouvoir créer un environnement qui, à l'ima
 <li><a href="#cas1">Utiliser une machine entièrement fonctionnelle</a> </li>
 <li><a href="#cas2">Créer vous-même votre environnement</a></li>
 </ul>
+<p>De plus, nous vous présenterons une <a href="#cas3">troisième partie</a> sur docker et notre premier Dockerfile</p>
 <h1>Utiliser une machine entièrement fonctionnelle <a name="cas1"></a></h1>
 <h2>Prérequis <a name="prerequis"></a></h2>
 <ul>
@@ -325,6 +326,54 @@ config.vm.box_url <span class="o">=</span> <span class="s2">&quot;file:///home/s
 <p>Et test du vagrant : </p>
 <div class="highlight"><pre><span></span><code>$ vagrant up 
 </code></pre></div>
+
+
+<h1>Notre premier fichier Docker <a name="cas3"></a></h1>
+<h2>Lancement du Dockerfile</h2>
+<p>Une fois connecté sur la machine virtuelle "vagrant" en SSH que nous venons de créer, veuillez lancer les actions suivantes :</p>
+<ol>
+<li>Vérifier que nous nous situons bien dans le HOME de l'utilisateur vagrant : <code>cd ~</code></li>
+<li>Récupérer la dernière version du repository dans lequel toutes les sources sont présentes en lançant la commande suivante : <code>git clone --depth 1 https://github.com/Ricky1981/OpenClassRooms_Projet3_Docker.git</code></li>
+<li>Construire le conteneur à partir du DockerFile : <code>docker build -t image_perso OpenClassRooms_Projet3_Docker/</code></li>
+<li>Lancer le conteneur : <code>docker run -d -p 8080:80 --name Projet03 image_perso</code></li>
+<li>Vérifier que le conteneur est bien actif : <code>docker ps</code>  </li>
+<li>Revenir sur sa machine local et tester l'URL suivante : http://192.168.33.10:8080 </li>
+<li>Si vous souhaitez arreter le conteneur : <code>docker stop Projet03</code></li>
+</ol>
+<h2>Explication du fichier</h2>
+<p>Voici le fichier Dockerfile du repository que vous avez recuperé. Nous détaillerons toutes les lignes de ce premier fichier très simple à comprendre</p>
+<div class="highlight"><pre><span></span><code>FROM debian:stable-slim
+
+RUN apt update <span class="o">&amp;&amp;</span> <span class="se">\</span>
+apt install -y nginx
+
+COPY ./index.html /var/www/html/
+
+EXPOSE <span class="m">80</span>
+
+CMD <span class="o">[</span><span class="s2">&quot;nginx&quot;</span>, <span class="s2">&quot;-g&quot;</span>, <span class="s2">&quot;daemon off;&quot;</span><span class="o">]</span>
+</code></pre></div>
+
+
+<h3>Ligne "FROM"</h3>
+<p>Cette ligne nous permet de recuperer l'image debian sur le site <a href="https://hub.docker.com/">DockerHub</a>.
+Vous pouvez suivre les étapes suivantes pour comprendre comment rechercher une image docker :</p>
+<p>Sur <a href="https://hub.docker.com/">DockerHub</a> faire un filtre sur les images officiels afin de pouvoir récuperer l’image Debian :</p>
+<p><img alt="Docker001" src="imagesperso/projet03/Docker001.png"></p>
+<p>Cliquer sur le lien </p>
+<p>Une fois sur la page suivante choisir sa version. De mon côté, je décide de prendre la version stable : </p>
+<p><img alt="Docker002" src="imagesperso/projet03/Docker002.png"></p>
+<h3>Ligne "RUN"</h3>
+<p>Cette ligne nous permet de lancer l'installation des package dont nous avons besoin. En l'occurence ici nous avons juste besoin de NGINX.</p>
+<h3>Ligne "COPY"</h3>
+<p>Dans le repository que vous venez de recuperer, le fichier index.html est un fichier "customisé" afin de verifier que notre installation fonctionne correctement.
+Ici, nous copions juste ce fichier index.html que nous plaçons dans le repertoire que NGINX utilisera à savoir /var/www/html</p>
+<p>Nous aurions pu ici aller plus loin en créant un Volume afin de pouvoir l'alimenter depuis notre poste local.</p>
+<h3>Ligne "EXPOSE"</h3>
+<p>Ici, comme son nom l'indique nous souhaitons "Exposer" le port 80 de notre conteneur. Sans cette ligne de commande, nous ne pourrons pas accéder à notre page HTML.</p>
+<h3>Ligne "CMD"</h3>
+<p>Nous souhaitons ici indiqué à docker que nous ne souhaitons pas que le daemon NGINX soit lancé lors de l'appel du conteneur Docker.
+En effet, c'est Docker qui portera notre site Web. Il ne faut donc pas "doublonner" les actions.</p>
   </div>
   <div class="tag-cloud">
     <p>
