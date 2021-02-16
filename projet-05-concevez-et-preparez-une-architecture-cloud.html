@@ -178,33 +178,39 @@ Nous ne partirons donc pas dans cette premiere version sur du Route53, CloudFron
 <li>VPC :​ Virtual Private Cloud. Le VPC est un sous-réseau qui vous permet de "regrouper" vos serveurs entre eux, pour qu'ils communiquent plus facilement et en toute sécurité.  </li>
 </ul>
 <h2>Opérations régulières sur ces différents services</h2>
-<p><em>Pour les instances EC2 :​<br>
-</em>Installation complète à faire​
-  <em>Backup à réaliser ​
-  </em>Mise à jour des différents logiciels​  </p>
-<p>​<em>Pour RDS MySQL :​<br>
-</em>Pas d’installation MySQL à réaliser​
-  <em>Mise à jour du logiciel réalisée par AWS​
-  </em>Sauvegarde automatique tous les jours sur les 7 derniers jours​
-  *Restauration possible à la seconde près​  </p>
-<p><em>Pour les services Managé (EKS / ElasticSearch Services) :​
-  </em>Backup non nécessaire​
-  *Patch de sécurité transparent</p>
+<ul>
+<li>Pour les instances EC2 :​  </li>
+<li>Installation complète à faire​  </li>
+<li>Backup à réaliser ​ </li>
+<li>Mise à jour des différents logiciels​  </li>
+</ul>
+<p>​* Pour RDS MySQL :​<br>
+  * Pas d’installation MySQL à réaliser​<br>
+  * Mise à jour du logiciel réalisée par AWS​<br>
+  * Sauvegarde automatique tous les jours sur les 7 derniers jours​<br>
+  * Restauration possible à la seconde près​  </p>
+<ul>
+<li>Pour les services Managé (EKS / ElasticSearch Services) :​  </li>
+<li>Backup non nécessaire​  </li>
+<li>Patch de sécurité transparent  </li>
+</ul>
 <h2>Plan de migration proposée (la plus simple)</h2>
 <p>Nous partons ici sur une migration dites à froid car c'est la plus simple à gérer même si nous aurions pu envisager une méthode de type blue/green</p>
 <p>Voici donc les étapes pour réaliser cette migration à froid :</p>
-<p><em>Création des différentes instances (EC2 / RDS / etc.)​
-</em>Copie des données​
-<em>Transfert des données​
-</em>Test de l’application​
-<em>Synchronisation des données quotidiennes jusqu’au jour de la migration​
-</em>Jour J : ​
-  <em>Coupure de service de l’ancienne infrastructure​
-  </em>Dernière synchronisation des données​
-  <em>Bascule DNS sur les nouvelles Ips​
-  </em>Tests de l’ensemble des fonctionnalités sur AWS :​
-   <em>Si OK : Ouverture du service sur AWS pour les clients​
-   </em>Si KO : Rollback DNS et Réouverture du service sur l’ancienne infrastructure pour les clients</p>
+<ul>
+<li>Création des différentes instances (EC2 / RDS / etc.)​  </li>
+<li>Copie des données​  </li>
+<li>Transfert des données​  </li>
+<li>Test de l’application​  </li>
+<li>Synchronisation des données quotidiennes jusqu’au jour de la migration​  </li>
+<li>Jour J : ​ </li>
+<li>Coupure de service de l’ancienne infrastructure​  </li>
+<li>Dernière synchronisation des données​  </li>
+<li>Bascule DNS sur les nouvelles Ips​  </li>
+<li>Tests de l’ensemble des fonctionnalités sur AWS :​  </li>
+<li>Si OK : Ouverture du service sur AWS pour les clients​  </li>
+<li>Si KO : Rollback DNS et Réouverture du service sur l’ancienne infrastructure pour les clients  </li>
+</ul>
   </div>
   <div class="tag-cloud">
     <p>
