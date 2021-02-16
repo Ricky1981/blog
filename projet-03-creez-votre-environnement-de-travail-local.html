@@ -123,9 +123,11 @@
     <p>Le but de ce premier "vrai" projet du parcours "Expert DevOps" d'OpenClassRooms est de mettre en place un environnement de développement de manière automatique en local sur notre poste. 
 En effet, la démarche DevOps est constituée de nombreuses tâches, au service des différent pôles informatiques, développeurs, exploitation, testing, etc. 
 C'est pourquoi il est important de pouvoir créer un environnement qui, à l'image des serveurs cibles, permet aux développeurs de travailler sur un environnement qui reproduit les conditions dans lesquelles leur code fonctionnera.</p>
-<p>Nous vous proposons ici deux méthodes pour utiliser une machine virtuelle sous Vagrant :
-- <a href="#cas1">Utiliser une machine entièrement fonctionnelle</a> 
-- <a href="#cas2">Créer vous-même votre environnement</a></p>
+<p>Nous vous proposons ici deux méthodes pour utiliser une machine virtuelle sous Vagrant :</p>
+<ul>
+<li><a href="#cas1">Utiliser une machine entièrement fonctionnelle</a> </li>
+<li><a href="#cas2">Créer vous-même votre environnement</a></li>
+</ul>
 <h1>Utiliser une machine entièrement fonctionnelle <a name="cas1"></a></h1>
 <h2>Prérequis <a name="prerequis"></a></h2>
 <ul>
@@ -249,6 +251,79 @@ root@vagrant-debian10:~# apt-get install ssh sudo
 <p>Enfin, on teste notre utilisateur vagrant afin de vérifier que le mot de passe ne soit plus necessaire.  </p>
 <div class="highlight"><pre><span></span><code><span class="c1"># exit </span>
 $ sudo ls 
+</code></pre></div>
+
+
+<p>Ensuite :</p>
+<div class="highlight"><pre><span></span><code>mkdir ~/.ssh 
+$ touch authorized_keys 
+</code></pre></div>
+
+
+<p>Puis ajouter dans authorized_keys la clé publique : </p>
+<div class="highlight"><pre><span></span><code>ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ<span class="o">==</span> vagrant insecure public key 
+</code></pre></div>
+
+
+<p>Puis on donne les bons droits : </p>
+<div class="highlight"><pre><span></span><code>$ chmod <span class="m">0700</span> ~/.ssh 
+$ chmod <span class="m">0600</span> ~/.ssh/authorized_keys 
+</code></pre></div>
+
+
+<p>Il faut aussi installer la VBoxGuestAddition de notre version sinon problème lors du mount (voir https://www.vagrantup.com/docs/providers/virtualbox/boxes.html) </p>
+<div class="highlight"><pre><span></span><code>wget http://download.virtualbox.org/virtualbox/6.1.16/VBoxGuestAdditions_6.1.16.iso  
+sudo mkdir /media/VBoxGuestAdditions 
+sudo mount -o loop,ro VBoxGuestAdditions_6.1.16.iso /media/VBoxGuestAdditions 
+sudo sh /media/VBoxGuestAdditions/VBoxLinuxAdditions.run 
+rm VBoxGuestAdditions_6.1.16.iso 
+sudo umount /media/VBoxGuestAdditions 
+sudo rmdir /media/VBoxGuestAdditions 
+</code></pre></div>
+
+
+<p>Si erreur de type : “Kernel header not found for targert kernel 4.19... Please install them and execute /sbin/rcvboxadd setup” 
+Faire :  </p>
+<div class="highlight"><pre><span></span><code>sudo apt-get install build-essential linux-headers-<span class="sb">`</span>uname -r<span class="sb">`</span> dkms 
+</code></pre></div>
+
+
+<p>et on relance le VBoxLinuxAdditons.run 
+Quand tout est OK, on se déconnecte et on éteint la machine. </p>
+<h3>Packaging</h3>
+<p>Nous avons donc une machine virtuelle nommée vagrant-debian10.6.0 dans Virtualbox. Nous allons la packager pour en faire une box. On se place dans le repertoire suivant : ~/Bureau/ownCloud/OpenClassRoom/Projet_03/vagrantBox/ </p>
+<p>Puis on lance la commande suivante : </p>
+<div class="highlight"><pre><span></span><code>$ vagrant package --base vagrant-debian10.6.0 
+</code></pre></div>
+
+
+<p>Le paramètre base est le nom de la VM dans VirtualBox. Un traitement un peu long va se produire et à la fin, vous obtiendrez un fichier package.box. Ce fichier, rangez le dans un endroit accessible à vos futures config vagrant : soit en le laissant dans ce dossier, soit en la mettant sur un serveur http. </p>
+<div class="highlight"><pre><span></span><code>$ vagrant package --base vagrant-debian10.6.0 
+<span class="o">==</span>&gt; vagrant-debian10.6.0: Exporting VM... 
+<span class="o">==</span>&gt; vagrant-debian10.6.0: Compressing package to: /home/seb/Bureau/ownCloud/OpenClassRoom /Projet_03/vagrantBox/ 
+</code></pre></div>
+
+
+<p>On renomme le fichier package.box pour retrouver le nom de notre VM à savoir vagrant-debian10.6.0.box </p>
+<div class="highlight"><pre><span></span><code>$ mv package.box vagrant-debian10.6.0.box 
+</code></pre></div>
+
+
+<h3>Test</h3>
+<p>On modifie le VagrantiFile initial comme suit : </p>
+<div class="highlight"><pre><span></span><code>Vagrant.configure<span class="o">(</span><span class="s2">&quot;2&quot;</span><span class="o">)</span> <span class="k">do</span> <span class="p">|</span>config<span class="p">|</span> 
+<span class="c1"># The most common configuration options are documented and commented below    . </span>
+<span class="c1"># For a complete reference, please see the online documentation at </span>
+<span class="c1"># https://docs.vagrantup.com. </span>
+<span class="c1"># Every Vagrant development environment requires a box. You can search for </span>
+<span class="c1"># boxes at https://vagrantcloud.com/search. </span>
+config.vm.box <span class="o">=</span> <span class="s2">&quot;vagrant-debian10.6.0&quot;</span> 
+config.vm.box_url <span class="o">=</span> <span class="s2">&quot;file:///home/seb/Bureau/ownCloud/OpenClassRoom/Projet_03/vagrantBox/vagrant-debian10.6.0.box&quot;</span> 
+</code></pre></div>
+
+
+<p>Et test du vagrant : </p>
+<div class="highlight"><pre><span></span><code>$ vagrant up 
 </code></pre></div>
   </div>
   <div class="tag-cloud">
