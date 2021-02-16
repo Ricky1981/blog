@@ -1,0 +1,784 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://ricky1981.github.io/blog/theme/pygments/github.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/font-awesome/css/solid.css">
+
+
+
+
+
+
+
+<meta name="author" content="Seb" />
+<meta name="description" content="Création d&#39;un pipeline (test du code, build, registry, déploiement, rollback)" />
+<meta name="keywords" content="projet, OpenClassRooms, gitlab, CI/CD">
+
+
+<meta property="og:site_name" content="Mon Blog Freelance"/>
+<meta property="og:title" content="Projet 06 - Mettez en place des process et des outils"/>
+<meta property="og:description" content="Création d&#39;un pipeline (test du code, build, registry, déploiement, rollback)"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://ricky1981.github.io/blog/projet-06-mettez-en-place-des-process-et-des-outils.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2021-02-16 00:00:00+01:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://ricky1981.github.io/blog/author/seb.html">
+<meta property="article:section" content="Accueil"/>
+<meta property="article:tag" content="projet"/>
+<meta property="article:tag" content="OpenClassRooms"/>
+<meta property="article:tag" content="gitlab"/>
+<meta property="article:tag" content="CI/CD"/>
+<meta property="og:image" content="">
+
+  <title>Mon Blog Freelance &ndash; Projet 06 - Mettez en place des process et des outils</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://ricky1981.github.io/blog">
+        <img src="https://ricky1981.github.io/blog/theme/img/profile.png" alt="Mon Blog Freelance" title="Mon Blog Freelance">
+      </a>
+
+      <h1>
+        <a href="https://ricky1981.github.io/blog">Mon Blog Freelance</a>
+      </h1>
+
+<p>Le début de ma future aventure DevOps!!!</p>
+
+      <nav>
+        <ul class="list">
+
+
+
+            <li>
+              <a target="_self" href="https://getpelican.com/" >Pelican</a>
+            </li>
+            <li>
+              <a target="_self" href="https://docs.gitlab.com/omnibus/docker/" >GitLab Docker</a>
+            </li>
+            <li>
+              <a target="_self" href="https://openclassrooms.com/fr/paths/100/projects/447/assignment" >Projet 04</a>
+            </li>
+        </ul>
+      </nav>
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/Ricky1981" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/sebastien-rykala-7767b81ba/" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://ricky1981.github.io/blog">Home</a>
+
+      <a href="archives.html">Archives</a>
+      <a href="categories.html">Categories</a>
+      <a href="tags.html">Tags</a>
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="projet-06-mettez-en-place-des-process-et-des-outils">Projet 06 - Mettez en place des process et des outils</h1>
+    <p>
+      Posted on Tue 16 February 2021 in <a href="https://ricky1981.github.io/blog/category/accueil.html">Accueil</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <p>Nous mettrons en place dans cet article un pipeline quasi complet sur un environnement local.
+Pour cela plusieurs étapes seront faites :
+- <a href="#cert">Création d'un certificat</a>
+- <a href="#gitlab">Installation de gitlab en local sur une VM Vagrant</a>
+- <a href="#runner">Installation du gitlab-runner de PréProduction sur une autre VM</a>
+- Installation du gitlab-runner de Production sur une autre VM
+- <a href="#pipeline">Création du pipeline</a></p>
+<h1>Schéma du processus de déploiement <a name="sommaire"></a></h1>
+<p>Le but ici est de mettre en place le processus suivant :</p>
+<p><img alt="Process001" src="imagesperso/projet06/Process001.png"></p>
+<p>Toutes ces étapes seront reprises dans le fichier .gitlab-ci.xml qui sera décrit plus loin dans cet article.</p>
+<h1>Création d'un certificat <a name="cert"></a></h1>
+<p>Je vous propose de ne pas utiliser lentsencrypt dans cet article mais de faire en sorte de devenir sa propre autorité de certification.
+En général une autorité de certification permet de garantir à un utilisateur lambda que le certificat que vous allez lui présenter correspond bien à ce que vous prétendez et ce sans devoir chercher à le vérifier lui-même. Pour que cela fonctionne, il faut que le client en question fasse déjà confiance à cette autorité.</p>
+<p>Or si vous êtes votre propre autorité, personne ne vous fera confiance. En fait ceci n'est utile que dans deux cas. Le premier pour faire des tests sans devoir payer (relativement cher). Le deuxième pour avoir des certificats SSL sur un parc de clients que vous pouvez maîtriser. Par exemple sur un intranet pour pouvez exiger des clients qu'ils installent votre autorité.</p>
+<p>Dans un premier temps nous allons créer notre clé privé, puis nous allons créer notre demande de certificat que nous signerons par lui-même :</p>
+<div class="highlight"><pre><span></span><code>seb : $ <span class="nb">cd</span> /home/seb/Documents/ownCloud/OpenClassRoom/CA 
+
+seb:CA$ openssl genrsa -des3 -out ca.key <span class="m">2048</span> 
+Generating RSA private key, <span class="m">2048</span> bit long modulus <span class="o">(</span><span class="m">2</span> primes<span class="o">)</span> 
+....................+++++ 
+.....+++++ 
+e is <span class="m">65537</span> <span class="o">(</span>0x010001<span class="o">)</span> 
+Enter pass phrase <span class="k">for</span> ca.key: 
+<span class="m">139925303420224</span>:error:28078065:UI routines:UI_set_result_ex:result too small:../crypto/ui/ui_lib.c:905:You must <span class="nb">type</span> in <span class="m">4</span> to <span class="m">1023</span> characters 
+Enter pass phrase <span class="k">for</span> ca.key: 
+<span class="m">139925303420224</span>:error:2807106B:UI routines:UI_process:processing error:../crypto/ui/ui_lib.c:545:while reading strings 
+Enter pass phrase <span class="k">for</span> ca.key: 
+Verifying - Enter pass phrase <span class="k">for</span> ca.key: 
+
+seb:CA$ ls -al 
+total <span class="m">12</span> 
+drwxrwxr-x  <span class="m">2</span> seb seb <span class="m">4096</span> févr.  <span class="m">2</span> <span class="m">17</span>:05 . 
+drwxrwxr-x <span class="m">14</span> seb seb <span class="m">4096</span> févr.  <span class="m">2</span> <span class="m">17</span>:05 .. 
+-rw-------  <span class="m">1</span> seb seb <span class="m">1743</span> févr.  <span class="m">2</span> <span class="m">17</span>:05 ca.key 
+
+seb:CA$ openssl req -new -key ca.key -out ca.csr 
+Enter pass phrase <span class="k">for</span> ca.key: 
+You are about to be asked to enter information that will be incorporated 
+into your certificate request. 
+What you are about to enter is what is called a Distinguished Name or a DN. 
+There are quite a few fields but you can leave some blank 
+For some fields there will be a default value, 
+If you enter <span class="s1">&#39;.&#39;</span>, the field will be left blank. 
+----- 
+Country Name <span class="o">(</span><span class="m">2</span> letter code<span class="o">)</span> <span class="o">[</span>AU<span class="o">]</span>:FR 
+State or Province Name <span class="o">(</span>full name<span class="o">)</span> <span class="o">[</span>Some-State<span class="o">]</span>:Paris 
+Locality Name <span class="o">(</span>eg, city<span class="o">)</span> <span class="o">[]</span>:Paris 
+Organization Name <span class="o">(</span>eg, company<span class="o">)</span> <span class="o">[</span>Internet Widgits Pty Ltd<span class="o">]</span>:Ricky 
+Organizational Unit Name <span class="o">(</span>eg, section<span class="o">)</span> <span class="o">[]</span>: 
+Common Name <span class="o">(</span>e.g. server FQDN or YOUR name<span class="o">)</span> <span class="o">[]</span>:ricky 
+Email Address <span class="o">[]</span>: 
+
+Please enter the following <span class="s1">&#39;extra&#39;</span> attributes 
+to be sent with your certificate request 
+A challenge password <span class="o">[]</span>: 
+An optional company name <span class="o">[]</span>: 
+
+seb:CA$ openssl x509 -req -days <span class="m">3650</span> -in ca.csr -signkey ca.key -out ca.crt 
+Signature ok 
+<span class="nv">subject</span><span class="o">=</span><span class="nv">C</span> <span class="o">=</span> FR, <span class="nv">ST</span> <span class="o">=</span> Paris, <span class="nv">L</span> <span class="o">=</span> Paris, <span class="nv">O</span> <span class="o">=</span> Ricky, <span class="nv">CN</span> <span class="o">=</span> ricky 
+Getting Private key 
+Enter pass phrase <span class="k">for</span> ca.key:  
+</code></pre></div>
+
+
+<p>Vous avez maintenant un certificat que vous pouvez utiliser pour signer tous vos autres certificats. Le certificat est dans ca.crt et sa clé privée dans ca.key.</p>
+<p>Maintenant faites les différents certificats pour votre organisation.
+Créez une clé sans mot de passe pour utiliser sur les serveurs. Ci-dessous, la première ligne est obligatoire car le mot de passe est obligatoire à la création.
+Dans la deuxième commande on le retire :</p>
+<div class="highlight"><pre><span></span><code>seb:CA$ openssl genrsa -des3 -out gitlab.devops.oc.key <span class="m">1024</span> 
+Generating RSA private key, <span class="m">1024</span> bit long modulus <span class="o">(</span><span class="m">2</span> primes<span class="o">)</span> 
+.....................................................................+++++ 
+..............+++++ 
+e is <span class="m">65537</span> <span class="o">(</span>0x010001<span class="o">)</span> 
+Enter pass phrase <span class="k">for</span> gitlab.devops.oc.key: 
+Verifying - Enter pass phrase <span class="k">for</span> gitlab.devops.oc.key: 
+
+seb:CA$ openssl rsa -in gitlab.devops.oc.key -out gitlab.devops.oc.key 
+Enter pass phrase <span class="k">for</span> gitlab.devops.oc.key: 
+<span class="m">140682069476672</span>:error:28078065:UI routines:UI_set_result_ex:result too small:../crypto/ui/ui_lib.c:905:You must <span class="nb">type</span> in <span class="m">4</span> to <span class="m">1023</span> characters 
+Enter pass phrase <span class="k">for</span> gitlab.devops.oc.key: 
+writing RSA key 
+</code></pre></div>
+
+
+<p>Ensuite on relance une commande pour faire une demande de certificat et une autre pour signez notre certificat avec notre autorité :</p>
+<div class="highlight"><pre><span></span><code>seb:CA$ openssl req -new -key gitlab.devops.oc.key -out gitlab.devops.oc.csr 
+You are about to be asked to enter information that will be incorporated 
+into your certificate request. 
+What you are about to enter is what is called a Distinguished Name or a DN. 
+There are quite a few fields but you can leave some blank 
+For some fields there will be a default value, 
+If you enter <span class="s1">&#39;.&#39;</span>, the field will be left blank. 
+----- 
+Country Name <span class="o">(</span><span class="m">2</span> letter code<span class="o">)</span> <span class="o">[</span>AU<span class="o">]</span>:FR 
+State or Province Name <span class="o">(</span>full name<span class="o">)</span> <span class="o">[</span>Some-State<span class="o">]</span>:Paris 
+Locality Name <span class="o">(</span>eg, city<span class="o">)</span> <span class="o">[]</span>: 
+Organization Name <span class="o">(</span>eg, company<span class="o">)</span> <span class="o">[</span>Internet Widgits Pty Ltd<span class="o">]</span>:devops 
+Organizational Unit Name <span class="o">(</span>eg, section<span class="o">)</span> <span class="o">[]</span>:gitlab 
+Common Name <span class="o">(</span>e.g. server FQDN or YOUR name<span class="o">)</span> <span class="o">[]</span>:gitlab.devops.oc       
+Email Address <span class="o">[]</span>: 
+
+Please enter the following <span class="s1">&#39;extra&#39;</span> attributes to be sent with your certificate request 
+A challenge password <span class="o">[]</span>: 
+An optional company name <span class="o">[]</span>: 
+
+seb:CA$ openssl x509 -req -in gitlab.devops.oc.csr -out gitlab.devops.oc.crt -CA ca.crt -CAkey ca.key -CAcreateserial 
+Signature ok 
+<span class="nv">subject</span><span class="o">=</span><span class="nv">C</span> <span class="o">=</span> FR, <span class="nv">ST</span> <span class="o">=</span> Paris, <span class="nv">O</span> <span class="o">=</span> devops, <span class="nv">OU</span> <span class="o">=</span> gitlab, <span class="nv">CN</span> <span class="o">=</span> gitlab.devops.oc 
+Getting CA Private Key 
+Enter pass phrase <span class="k">for</span> ca.key: 
+</code></pre></div>
+
+
+<p>Vous avez votre nouveau certificat signé par votre autorité dans gitlab.devops.oc.crt et sa clé privée directement utilisable dans gitlab.devops.oc.key (sans mot de passe pour utilisation directe sur un serveur).</p>
+<p>Il est temps que vos utilisateurs vous fassent confiance. Pour cela distribuez votre fichier ca.crt et ajoutez le à vos navigateurs.</p>
+<p>Dans firefox :</p>
+<div class="highlight"><pre><span></span><code><span class="err">Outils -&gt; options -&gt; avancé -&gt; chiffrement -&gt; afficher les certificats -&gt; autorités -&gt; importer</span>
+<span class="err">Puis sélectionnez votre certificat et utilisez pour les site web.</span>
+</code></pre></div>
+
+
+<p><img alt="cert" src="imagesperso/projet06/cert.png"></p>
+<p>Si votre navigateur refuse le format x509, proposez lui du pkcs12</p>
+<div class="highlight"><pre><span></span><code>$ openssl pkcs12 -export -in ca.crt -nokeys -out ca.p12
+</code></pre></div>
+
+
+<p><a href="#sommaire">Revenir en haut de page</a></p>
+<h1>Installation de gitlab en local sur une VM Vagrant <a name="gitlab"></a></h1>
+<h2>Vagrantfile</h2>
+<p>Pour réaliser cette installation nous vous proposons d'utiliser une VM créer via un Vagrantfile.
+Il faudra ajouter les lignes suivantes pour faire en sorte que gitlab puisse s'installer automatiquement dans votre Vagrantfile :</p>
+<div class="highlight"><pre><span></span><code>config.vm.define <span class="s2">&quot;gitlab&quot;</span> <span class="k">do</span> <span class="p">|</span>gitlab<span class="p">|</span>
+    gitlab.vm.hostname <span class="o">=</span> <span class="o">[</span>gitlab_hostname<span class="o">]</span>
+    gitlab.vm.network <span class="s2">&quot;private_network&quot;</span>, ip: <span class="o">[</span>gitlab_ip_address<span class="o">]</span>
+
+    <span class="c1"># Ci-dessous, nous recuperons les certificats que nous venons de créer et nous les mettons dans le repertoires /vagrant de notre VM</span>
+    gitlab.vm.synced_folder <span class="s2">&quot;/home/seb/Documents/ownCloud/OpenClassRoom/Projet_06/SiteVieillot-master/Certificats&quot;</span>, <span class="s2">&quot;/vagrant&quot;</span><span class="c1">#, type: &quot;nfs&quot;</span>
+
+    <span class="c1"># Copie du docker-compose.yml que nous vous présentons plus bas dans ce chapitre</span>
+    gitlab.vm.provision <span class="s2">&quot;file&quot;</span> <span class="k">do</span> <span class="p">|</span>file<span class="p">|</span>
+      file.source      <span class="o">=</span> <span class="s1">&#39;~/Documents/ownCloud/OpenClassRoom/Projet_06/Vagrant/GitLab_docker-compose.yml&#39;</span>
+      file.destination <span class="o">=</span> <span class="s1">&#39;/home/vagrant/docker-compose.yml&#39;</span>
+    end
+
+    <span class="c1"># Nous provisionnons notre VM avec les outils dont nous avons besoin pour travailler</span>
+    gitlab.vm.provision <span class="s2">&quot;shell&quot;</span>, inline: <span class="s">&lt;&lt;-SHELL</span>
+<span class="s">      BASHRCFILE=&#39;/home/vagrant/.bashrc&#39;</span>
+
+<span class="s">      apt-get update</span>
+
+<span class="s">      # Ajout Docker</span>
+<span class="s">      apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common</span>
+<span class="s">        curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -</span>
+<span class="s">        sudo add-apt-repository &quot;deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable&quot;</span>
+<span class="s">        sudo apt-get update</span>
+<span class="s">        sudo apt-get install -y docker-ce docker-ce-cli containerd.io</span>
+<span class="s">        usermod -aG docker vagrant  </span>
+
+<span class="s">      # Ajout Docker Compose</span>
+<span class="s">      curl -Ls &quot;https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)&quot; -o /usr/local/bin/docker-compose </span>
+<span class="s">      chmod +x /usr/local/bin/docker-compose</span>
+
+<span class="s">      # Ajout GitLab</span>
+<span class="s">      GITLABADD=&quot;export GITLAB_HOME=/srv/gitlab&quot;</span>
+<span class="s">      grep -qFx &quot;$GITLABADD&quot; &quot;$BASHRCFILE&quot; || echo &quot;$GITLABADD&quot; &gt;&gt; &quot;$BASHRCFILE&quot;</span>
+<span class="s">      # Création des repertoires afin de ne pas perdre le travail</span>
+<span class="s">      mkdir -p /srv/gitlab </span>
+<span class="s">      mkdir -p /srv/gitlab/config</span>
+<span class="s">      mkdir -p /srv/gitlab/logs</span>
+<span class="s">      mkdir -p /srv/gitlab/data</span>
+
+<span class="s">    SHELL</span>
+  end
+</code></pre></div>
+
+
+<p>Comme vous pouvez le constater dans le Vagrantfile, il faut disposer du fichier GitLab_docker-compose.yml.
+Le voici :</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Nous utilisons la version 3.8 car notre moteur Docker est supérieur à la version 19.03.0+</span>
+version: <span class="s2">&quot;3.8&quot;</span>
+services: 
+  web:
+    <span class="c1"># vous pouvez aller sur le lien suivant si vous souhaitez plus d&#39;information https://docs.gitlab.com/omnibus/docker/</span>
+    image: <span class="s1">&#39;gitlab/gitlab-ee:latest&#39;</span>
+    restart: always
+    hostname: <span class="s1">&#39;gitlab.example.com&#39;</span>
+    environment:
+      VIRTUAL_HOST: gitlab.devops.oc
+      GITLAB_OMNIBUS_CONFIG: <span class="p">|</span>
+        external_url <span class="s1">&#39;https://gitlab.devops.oc&#39;</span>
+    ports:
+      - <span class="s1">&#39;80:80&#39;</span>
+      - <span class="s1">&#39;443:443&#39;</span>
+      <span class="c1"># Redirection du port 22 car déjà utilisé par vagrant --&gt; sudo lsof -i:22</span>
+      - <span class="s1">&#39;5822:22&#39;</span>
+      <span class="c1"># On rajoute le port 5050 qui nous permettra d&#39;utiliser la registry</span>
+      - <span class="s1">&#39;5050:5050&#39;</span>
+    <span class="c1"># On crée nos volumes afin de ne pas perdre notre travail au cas où on supprimerait l&#39;image docker</span>
+    volumes:
+      - <span class="s1">&#39;${GITLAB_HOME}/config:/etc/gitlab&#39;</span>
+      - <span class="s1">&#39;${GITLAB_HOME}/logs:/var/log/gitlab&#39;</span>
+      - <span class="s1">&#39;${GITLAB_HOME}/data:/var/opt/gitlab&#39;</span>
+    container_name: gitlab-ee
+</code></pre></div>
+
+
+<p>On copie ensuite nos certifcats gitlab.devops.oc.crt / gitlab.devops.oc.key dans la VM gitlab sous /srv/gitlab/config/ssl :</p>
+<div class="highlight"><pre><span></span><code>vagrant@gitlab:/srv/gitlab/config$ sudo mkdir ssl 
+vagrant@gitlab:/srv/gitlab/config$ sudo cp /vagrant/* ssl/ 
+vagrant@gitlab:/srv/gitlab/config$ <span class="nb">cd</span> ssl 
+vagrant@gitlab:/srv/gitlab/config/ssl$ ls -al 
+total <span class="m">24</span> 
+drwxr-xr-x <span class="m">2</span> root root <span class="m">4096</span> Feb <span class="m">15</span> <span class="m">11</span>:02 . 
+drwxr-xr-x <span class="m">3</span> root root <span class="m">4096</span> Feb <span class="m">15</span> <span class="m">11</span>:02 .. 
+-rw-r--r-- <span class="m">1</span> root root <span class="m">1147</span> Feb <span class="m">15</span> <span class="m">11</span>:02 ca.crt 
+-rw-r--r-- <span class="m">1</span> root root  <span class="m">985</span> Feb <span class="m">15</span> <span class="m">11</span>:02 gitlab.devops.oc.crt 
+-rw-r--r-- <span class="m">1</span> root root  <span class="m">631</span> Feb <span class="m">15</span> <span class="m">11</span>:02 gitlab.devops.oc.csr 
+-rw------- <span class="m">1</span> root root  <span class="m">887</span> Feb <span class="m">15</span> <span class="m">11</span>:02 gitlab.devops.oc.key 
+
+vagrant@gitlab:/srv/gitlab/config/ssl$ <span class="nb">cd</span> /srv/gitlab 
+vagrant@gitlab:/srv/gitlab$ sudo mkdir ssl 
+vagrant@gitlab:/srv/gitlab$ sudo cp config/ssl/* ssl/ 
+</code></pre></div>
+
+
+<p><a href="#sommaire">Revenir en haut de page</a></p>
+<h2>docker-compose</h2>
+<p>Une fois votre VM créée et lancé, nous pouvons lancer la construction de notre conteneur.
+Se connecter sur la VM gitlab en SSH via la commande : <code>vagrant ssh gitlab</code></p>
+<p>Et on lance la commande docker-compose up -d qui permet de lancer le conteneur Gitlab-ee : </p>
+<div class="highlight"><pre><span></span><code>vagrant@gitlab:~$ docker-compose up -d 
+Creating network <span class="s2">&quot;vagrant_default&quot;</span> with the default driver 
+Pulling web <span class="o">(</span>gitlab/gitlab-ee:latest<span class="o">)</span>... 
+latest: Pulling from gitlab/gitlab-ee 
+4007a89234b4: Pull <span class="nb">complete</span> 
+5dfa26c6b9c9: Pull <span class="nb">complete</span> 
+0ba7bf18aa40: Pull <span class="nb">complete</span> 
+4c6ec688ebe3: Pull <span class="nb">complete</span> 
+72eacee67489: Pull <span class="nb">complete</span> 
+365d4a62ba05: Pull <span class="nb">complete</span> 
+bb2049c52331: Pull <span class="nb">complete</span> 
+733d13c75431: Pull <span class="nb">complete</span> 
+2abfb347b972: Pull <span class="nb">complete</span> 
+f85b8ef0c4e3: Extracting <span class="o">[=============</span>&gt;   
+</code></pre></div>
+
+
+<p>Cette installation peut prendre une bonne dizaine de minute. </p>
+<p>Il est possible de suivre les différentes étapes en regardant les logs directement dans le conteneur : </p>
+<p><code>docker logs –f gitlab-ee</code></p>
+<p>Une fois terminé, on tente la connexion : https://gitlab.devops.oc </p>
+<p>Nous devrions arriver sur cette page : </p>
+<p><img alt="gitLab001" src="imagesperso/projet06/gitLab001.png"></p>
+<p>Nous allons désormais configurer notre gitlab pour le reste du projet (registry, etc.) </p>
+<p>Pour cela, nous éditons le fichier gitlab.rb  </p>
+<p><code>vagrant@gitlab:~$ sudo vim /srv/gitlab/config/gitlab.rb</code> </p>
+<p>Puis nous ajoutons à la fin de ce fichier les informations suivantes : </p>
+<div class="highlight"><pre><span></span><code>external_url <span class="s2">&quot;https://gitlab.devops.oc&quot;</span> 
+letsencrypt<span class="o">[</span><span class="s1">&#39;enable&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="nb">false</span> 
+nginx<span class="o">[</span><span class="s1">&#39;ssl_certificate&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;/etc/gitlab/ssl/gitlab.devops.oc.crt&quot;</span> 
+nginx<span class="o">[</span><span class="s1">&#39;ssl_certificate_key&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;/etc/gitlab/ssl/gitlab.devops.oc.key&quot;</span> 
+registry_external_url <span class="s2">&quot;https://gitlab.devops.oc:5050&quot;</span> 
+registry_nginx<span class="o">[</span><span class="s1">&#39;ssl_certificate&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;/etc/gitlab/ssl/gitlab.devops.oc.crt&quot;</span> 
+registry_nginx<span class="o">[</span><span class="s1">&#39;ssl_certificate_key&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="s2">&quot;/etc/gitlab/ssl/gitlab.devops.oc.key&quot;</span> 
+nginx<span class="o">[</span><span class="s1">&#39;redirect_http_to_https&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="nb">true</span> 
+registry_nginx<span class="o">[</span><span class="s1">&#39;enable&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="nb">true</span> 
+registry_nginx<span class="o">[</span><span class="s1">&#39;listen_port&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="m">5050</span> 
+</code></pre></div>
+
+
+<p>Il faut ensuite relancer la configuration. Pour cela, nous entrons dans le conteneur gitlab puis nous lançons la commande adéquate : </p>
+<div class="highlight"><pre><span></span><code>vagrant@gitlab:~$ docker <span class="nb">exec</span> -ti gitlab-ee bash 
+root@gitlab:/# gitlab-ctl reconfigure 
+root@gitlab:/# gitlab-ctl restart 
+</code></pre></div>
+
+
+<p>L’utilisateur par défaut est root:  </p>
+<p><img alt="gitLab002" src="imagesperso/projet06/gitLab002.png"></p>
+<p>Puis créer un nouvel utilisateur : </p>
+<p><img alt="gitLab003" src="imagesperso/projet06/gitLab003.png"></p>
+<p>Se deconnecter de root et se logguer avec ce nouveau compte. </p>
+<p>Enfin, se connecter avec le compte nouvellement crée puis cliquer sur “Create a project” / Create Blank Project que nous appelerons “projet06” en Public  </p>
+<p><img alt="gitLab004" src="imagesperso/projet06/gitLab004.png"></p>
+<p><img alt="gitLab005" src="imagesperso/projet06/gitLab005.png"> </p>
+<p><img alt="gitLab006" src="imagesperso/projet06/gitLab006.png"></p>
+<p>La fenetre suivante devrait apparaitre :</p>
+<p><img alt="gitLab007" src="imagesperso/projet06/gitLab007.png"></p>
+<p>Cliquer ensuite sur “Settings” / “CI/CD” puis “Expand Runner” : </p>
+<p><img alt="gitLab008" src="imagesperso/projet06/gitLab008.png"></p>
+<p>Le but étant de recuperer les infos necessaire à la création d’un runner qui sont lister ci-dessous (une fois la partie Runners ouvertes) : </p>
+<p><img alt="gitLab009" src="imagesperso/projet06/gitLab009.png"></p>
+<p>Il est temps de passer à l'installation des Runners sur nos autres environnements de PréProduction et de Production</p>
+<p><a href="#sommaire">Revenir en haut de page</a></p>
+<h1>Installation du gitlab-runner <a name="runner"></a></h1>
+<p>Cette partie sera valable pour les environnements de PréProduction ainsi que de Production.
+En effet, pour simuler la "vie réelle", nous disposerons au total de 3 environnements :</p>
+<ul>
+<li>notre serveur GitLab</li>
+<li>notre environnement de PréProduction avec un runner dedié</li>
+<li>notre environnement de Production avec un runner dedié</li>
+</ul>
+<p>Voici la partie à rajouter (en plus de Docker et de Docker Compose comme pour la VM GitLab) dans votre Vagrantfile pour ces deux environnements (PréProduction / Production) :</p>
+<div class="highlight"><pre><span></span><code>  <span class="c1"># Ajout GitLab Runner</span>
+  <span class="c1"># Création des repertoires afin de ne pas perdre le travail</span>
+  mkdir -p /srv/gitlab-runner
+  mkdir -p /srv/gitlab-runner/config
+</code></pre></div>
+
+
+<p>Vous l'aurez compris, nous créeons uniquement les volumes qui nous serons utile. Le reste se fera via un docker-compose que je vous présente ici :</p>
+<div class="highlight"><pre><span></span><code>version: <span class="s2">&quot;3.8&quot;</span>
+services: 
+  runner:
+    image: gitlab/gitlab-runner:latest
+    restart: always
+    volumes:
+      - <span class="s1">&#39;${GITLABRUNNER_HOME}/config:/etc/gitlab-runner&#39;</span>
+      - <span class="s1">&#39;/var/run/docker.sock:/var/run/docker.sock&#39;</span>
+    container_name: gitlab-runner
+</code></pre></div>
+
+
+<p>Le principe est donc le meme que pour l'installation de GitLab.</p>
+<p>Une fois votre environnement crée, connecteé vous en ssh dessus puis lancer la commande suivante (dans notre exemple ci-dessous nous serons sur notre environnement de PréProduction, il faudra faire la meme chose pour l'environnement de Production) :</p>
+<div class="highlight"><pre><span></span><code>vagrant@recette:~$ docker-compose up -d 
+Creating network <span class="s2">&quot;vagrant_default&quot;</span> with the default driver 
+Pulling runner <span class="o">(</span>gitlab/gitlab-runner:latest<span class="o">)</span>... 
+latest: Pulling from gitlab/gitlab-runner 
+da7391352a9b: Pull <span class="nb">complete</span> 
+14428a6d4bcd: Pull <span class="nb">complete</span> 
+2c2d948710f2: Pull <span class="nb">complete</span> 
+a7a5dfeeff72: Pull <span class="nb">complete</span> 
+6f727095f1d5: Pull <span class="nb">complete</span> 
+246f720c7ed0: Pull <span class="nb">complete</span> 
+cc89c760c9c4: Pull <span class="nb">complete</span> 
+Digest: sha256:cff5d359dcc0e1386e37f551bd7b31ec973df856c3dfbf4c278d02bfef8e3585 
+Status: Downloaded newer image <span class="k">for</span> gitlab/gitlab-runner:latest 
+Creating gitlab-runner ... <span class="k">done</span> 
+</code></pre></div>
+
+
+<p>Nous entrons ensuite dans le conteneur gitlab-runner de notre environnement de recette pour lancer l'enregistrement :</p>
+<div class="highlight"><pre><span></span><code>vagrant@recette:/srv/gitlab-runner/config$ docker <span class="nb">exec</span> -ti gitlab-runner bash 
+root@00de709eafcf:/# gitlab-runner register --tls-ca-file<span class="o">=</span>/etc/gitlab-runner/certs/ca.crt 
+Runtime platform                                    <span class="nv">arch</span><span class="o">=</span>amd64 <span class="nv">os</span><span class="o">=</span>linux <span class="nv">pid</span><span class="o">=</span><span class="m">123</span> <span class="nv">revision</span><span class="o">=</span>8fa89735 <span class="nv">version</span><span class="o">=</span><span class="m">13</span>.6.0 
+Running in system-mode.                             
+
+Enter the GitLab instance URL <span class="o">(</span><span class="k">for</span> example, https://gitlab.com/<span class="o">)</span>: 
+https://gitlab.devops.oc/ 
+Enter the registration token: 
+1aCQdeqcRVdgSbE55PyC 
+Enter a description <span class="k">for</span> the runner: 
+<span class="o">[</span>00de709eafcf<span class="o">]</span>: Recette_Runner 
+Enter tags <span class="k">for</span> the runner <span class="o">(</span>comma-separated<span class="o">)</span>: 
+
+Registering runner... succeeded                     <span class="nv">runner</span><span class="o">=</span>1aCQdeqc 
+Enter an executor: docker, docker-ssh, shell, ssh, docker+machine, custom, virtualbox, docker-ssh+machine, kubernetes, parallels: 
+docker 
+Enter the default Docker image <span class="o">(</span><span class="k">for</span> example, ruby:2.6<span class="o">)</span>: 
+docker:stable 
+Runner registered successfully. Feel free to start it, but <span class="k">if</span> it<span class="err">&#39;</span>s running already the config should be automatically reloaded!  
+</code></pre></div>
+
+
+<p>Faire les modifications suivantes dans le fichier config.toml : </p>
+<p>vagrant@recette:/etc/docker$ sudo vim /srv/gitlab-runner/config/config.toml  </p>
+<div class="highlight"><pre><span></span><code><span class="nv">concurrent</span> <span class="o">=</span> <span class="m">1</span> 
+<span class="nv">check_interval</span> <span class="o">=</span> <span class="m">0</span> 
+
+<span class="o">[</span>session_server<span class="o">]</span> 
+  <span class="nv">session_timeout</span> <span class="o">=</span> <span class="m">1800</span>   
+<span class="o">[[</span>runners<span class="o">]]</span> 
+  <span class="nv">name</span> <span class="o">=</span> <span class="s2">&quot;tt&quot;</span> 
+  <span class="nv">url</span> <span class="o">=</span> <span class="s2">&quot;https://gitlab.devops.oc/&quot;</span> 
+  <span class="nv">token</span> <span class="o">=</span> <span class="s2">&quot;NYCqwd_1yWoscb3FW8J8&quot;</span> 
+  tls-ca-file <span class="o">=</span> <span class="s2">&quot;/etc/gitlab-runner/certs/ca.crt&quot;</span> 
+  tls-cert-file <span class="o">=</span> <span class="s2">&quot;/etc/gitlab-runner/certs/gitlab.devops.oc.crt&quot;</span>
+  tls-key-file <span class="o">=</span> <span class="s2">&quot;/etc/gitlab-runner/certs/gitlab.devops.oc.key&quot;</span> 
+  <span class="nv">executor</span> <span class="o">=</span> <span class="s2">&quot;docker&quot;</span> 
+  <span class="o">[</span>runners.cache<span class="o">]</span> 
+    <span class="nv">Insecure</span> <span class="o">=</span> <span class="nb">false</span> 
+  <span class="o">[</span>runners.docker<span class="o">]</span> 
+    <span class="nv">tls_verify</span> <span class="o">=</span> <span class="nb">false</span> 
+    <span class="nv">image</span> <span class="o">=</span> <span class="s2">&quot;docker:stable&quot;</span> 
+    <span class="nv">privileged</span> <span class="o">=</span> <span class="nb">false</span> 
+    <span class="nv">disable_entrypoint_overwrite</span> <span class="o">=</span> <span class="nb">false</span> 
+    <span class="nv">oom_kill_disable</span> <span class="o">=</span> <span class="nb">false</span> 
+    <span class="nv">disable_cache</span> <span class="o">=</span> <span class="nb">false</span> 
+    <span class="nv">volumes</span> <span class="o">=</span> <span class="o">[</span>“/var/run/docker.sock:/var/run/docker.sock<span class="s2">&quot;, &quot;</span>/cache<span class="s2">&quot;] </span>
+<span class="s2">    shm_size = 0 </span>
+</code></pre></div>
+
+
+<p>Ajouter également (en créant les repertoires) : </p>
+<div class="highlight"><pre><span></span><code>vagrant@recette:~$ <span class="nb">cd</span> /etc/docker 
+vagrant@recette:/etc/docker$ sudo mkdir certs.d 
+vagrant@recette:/etc/docker$ <span class="nb">cd</span> certs.d/ 
+vagrant@recette:/etc/docker/certs.d$ sudo mkdir gitlab.devops.oc 
+vagrant@recette:/etc/docker/certs.d$ <span class="nb">cd</span> gitlab.devops.oc/ 
+vagrant@recette:/etc/docker/certs.d/gitlab.devops.oc$ sudo cp -a /vagrant/Certificats/* . 
+vagrant@recette:/etc/docker/certs.d/gitlab.devops.oc$ sudo mv gitlab.devops.oc.crt gitlab.devops.oc.cert 
+vagrant@recette:/etc/docker/certs.d/gitlab.devops.oc$ <span class="nb">cd</span> .. 
+vagrant@recette:/etc/docker/certs.d$ sudo cp -Ra gitlab.devops.oc/ gitlab.devops.oc:
+</code></pre></div>
+
+
+<p>Puis faire un test de connexion à la registery : </p>
+<div class="highlight"><pre><span></span><code>vagrant@recette:/etc/docker$ docker login gitlab.devops.oc:5050 
+Authenticating with existing credentials... 
+WARNING! Your password will be stored unencrypted in /home/vagrant/.docker/config.json. 
+Configure a credential helper to remove this warning. See 
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store 
+
+Login Succeeded 
+</code></pre></div>
+
+
+<p>Si tout est OK, dans GitLab nous devrions voir désormais notre runner actif :</p>
+<p><img alt="gitLab10" src="imagesperso/projet06/gitLab10.png"></p>
+<p>Faire de même sur l'environnement de Production</p>
+<p><a href="#sommaire">Revenir en haut de page</a></p>
+<h1>Création du pipeline <a name="pipeline"></a></h1>
+<h2>Prérequis</h2>
+<p>Dans la présentation suivante, nous utiliserons notre environnement de PréProduction.
+On va dans un premier temps créer un utilisateur qui sera dedié au deploiement et que l’on nomme deployer : </p>
+<div class="highlight"><pre><span></span><code>vagrant@recette:~$ sudo adduser deployer 
+Adding user <span class="sb">`</span>deployer<span class="s1">&#39; ... </span>
+<span class="s1">Adding new group `deployer&#39;</span> <span class="o">(</span><span class="m">1001</span><span class="o">)</span> ... 
+Adding new user <span class="sb">`</span>deployer<span class="s1">&#39; (1001) with group `deployer&#39;</span> ... 
+Creating home directory <span class="sb">`</span>/home/deployer<span class="s1">&#39; ... </span>
+<span class="s1">Copying files from `/etc/skel&#39;</span> ... 
+New password: OpenClass 
+Retype new password: OpenClass 
+passwd: password updated successfully 
+Changing the user information <span class="k">for</span> deployer 
+Enter the new value, or press ENTER <span class="k">for</span> the default 
+Full Name <span class="o">[]</span>:  
+Room Number <span class="o">[]</span>:  
+Work Phone <span class="o">[]</span>:  
+Home Phone <span class="o">[]</span>:  
+Other <span class="o">[]</span>:  
+Is the information correct? <span class="o">[</span>Y/n<span class="o">]</span> y 
+</code></pre></div>
+
+
+<p>Puis on l’ajoute dans le groupe docker :  </p>
+<div class="highlight"><pre><span></span><code>vagrant@recette:~$ sudo usermod -aG docker deployer 
+</code></pre></div>
+
+
+<p>Cela permet à l’utilisateur “deployer” d’executer les commandes docker qui sont requis pour réaliser le deploiement </p>
+<p>On va ensuite créer une paire de clé privée / public sur notre VM de recette pour l’utilisateur “deployer”. Attention, ne pas mettre de mot de passe car le pipeline execute en mode non interactif les commandes et par conséquent ne pourra pas rentrer le mot de passe : </p>
+<div class="highlight"><pre><span></span><code>vagrant@recette:~$ su - deployer 
+Password: OpenClass 
+deployer@recette:/home/vagrant$ ssh-keygen -b <span class="m">4096</span> 
+Generating public/private rsa key pair. 
+Enter file in which to save the key <span class="o">(</span>/home/deployer/.ssh/id_rsa<span class="o">)</span>:  
+Created directory <span class="s1">&#39;/home/deployer/.ssh&#39;</span>. 
+Enter passphrase <span class="o">(</span>empty <span class="k">for</span> no passphrase<span class="o">)</span>:  
+Enter same passphrase again:  
+Your identification has been saved in /home/deployer/.ssh/id_rsa. 
+Your public key has been saved in /home/deployer/.ssh/id_rsa.pub. 
+The key fingerprint is: 
+SHA256:bks0VGM5japqCIx3/CCrKdbJzRwi9hdQxnRO87qBluI deployer@recette 
+The key<span class="err">&#39;</span>s randomart image is: 
++---<span class="o">[</span>RSA <span class="m">4096</span><span class="o">]</span>----+ 
+<span class="p">|</span>    o. +  ++     <span class="p">|</span> 
+<span class="p">|</span>     ++ oo+..    <span class="p">|</span> 
+<span class="p">|</span>    o  ..o .     <span class="p">|</span> 
+<span class="p">|</span>   .  o.o        <span class="p">|</span> 
+<span class="p">|</span>o  o.+ +S        <span class="p">|</span> 
+<span class="p">|</span>o++.*o.oo.       <span class="p">|</span> 
+<span class="p">|</span>.o<span class="o">=</span>E*+o.+        <span class="p">|</span> 
+<span class="p">|</span>.oo<span class="o">=</span><span class="nv">o</span><span class="o">=</span>.o .       <span class="p">|</span> 
+<span class="p">|</span><span class="o">=</span>. ..   .        <span class="p">|</span> 
++----<span class="o">[</span>SHA256<span class="o">]</span>-----+ 
+deployer@recette:/home/vagrant$ 
+</code></pre></div>
+
+
+<p>Pour autoriser cette clé SSH, nous devons ajouter la clé public dans le fichier authorized_keys : </p>
+<div class="highlight"><pre><span></span><code>deployer@recette:/home/vagrant$ cat ~/.ssh/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys 
+</code></pre></div>
+
+
+<p>Enfin, nous allons stocker notre clé privé dans la variable GitLab afin que notre pipeline puisse se loguer sur notre serveur. </p>
+<p>Pour se faire, on navigue dans gitlab dans Settings &gt; CI / CD &gt; Variables puis on clique sur “Add Variable”. Puis renseigner les valeurs suivantes :  </p>
+<ul>
+<li>Key: ID_RSA_RECETTE </li>
+<li>Value: Paste your SSH private key from your clipboard (including a line break at the end) (--&gt; deployer@recette:/home/vagrant$ cat ~/.ssh/id_rsa) </li>
+<li>Type: File </li>
+<li>Environment Scope: All (default) </li>
+<li>Protect variable: Checked </li>
+<li>Mask variable: Unchecked </li>
+</ul>
+<p><img alt="pipeline001" src="imagesperso/projet06/pipeline001.png"></p>
+<p>De même, nous allons créer une Variable pour l'IP de notre serveur de PréProduction :</p>
+<ul>
+<li>Key: SERVER </li>
+<li>Value: Votre adresse IP</li>
+<li>Type: Variable </li>
+<li>Environment Scope: All (default) </li>
+<li>Protect variable: Checked </li>
+<li>Mask variable: Checked</li>
+</ul>
+<p>![pipeline002](imagesperso/projet06/pipeline002.png</p>
+<p>Enfin, une dernière variable pour notre utilisateur :</p>
+<ul>
+<li>Key: SERVER_USER </li>
+<li>Value: deployer</li>
+<li>Type: Variable </li>
+<li>Environment Scope: All (default) </li>
+<li>Protect variable: Checked </li>
+<li>Mask variable: Checked</li>
+</ul>
+<p>![pipeline003](imagesperso/projet06/pipeline003.png</p>
+<p>Faire de meme pour les variable de production (création du compte deployer, usermod, variable clé privé + IP du serveur</p>
+<p><a href="#sommaire">Revenir en haut de page</a></p>
+<h2>CI/CD</h2>
+<p>Voici le fichier complet qui permettra de réaliser le pipeline présenté lors du schema en tout début de cet article :</p>
+<div class="highlight"><pre><span></span><code><span class="n">stages</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">test</span>
+  <span class="o">-</span> <span class="n">build</span>
+  <span class="o">-</span> <span class="n">deploy</span>
+
+<span class="n">variables</span><span class="p">:</span>
+  <span class="n">TAG_COMMIT</span><span class="p">:</span> <span class="err">$</span><span class="n">CI_REGISTRY_IMAGE</span><span class="o">/</span><span class="err">$</span><span class="n">CI_COMMIT_REF_NAME</span><span class="p">:</span><span class="err">$</span><span class="n">CI_COMMIT_SHORT_SHA</span>
+
+<span class="n">build_job</span><span class="p">:</span>
+  <span class="o">#</span> <span class="k">On</span> <span class="n">prend</span> <span class="n">la</span> <span class="n">même</span> <span class="n">image</span> <span class="n">que</span> <span class="n">celle</span> <span class="n">utilisée</span> <span class="n">dans</span> <span class="n">le</span> <span class="n">Vagrantfile</span> <span class="n">pour</span> <span class="err">ê</span><span class="n">tre</span> <span class="n">iso</span> <span class="err">à</span> <span class="n">l</span><span class="s1">&#39;environnement de travail de Sergio</span>
+<span class="s1">  image: debian:buster-slim</span>
+<span class="s1">  stage: test</span>
+<span class="s1">  script:</span>
+<span class="s1">    # On lance l&#39;</span><span class="n">installation</span> <span class="n">des</span> <span class="n">packages</span> <span class="n">nécessaires</span> <span class="n">toujours</span> <span class="n">pour</span> <span class="err">ê</span><span class="n">tre</span> <span class="n">iso</span> <span class="err">à</span> <span class="n">l</span><span class="s1">&#39;environnement de Sergio</span>
+<span class="s1">    - apt-get update</span>
+<span class="s1">    - apt -y install rsync wget unzip lsb-release apt-transport-https ca-certificates</span>
+<span class="s1">    - wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg</span>
+<span class="s1">    - echo &quot;deb https://packages.sury.org/php/ $(lsb_release -sc) main&quot; | tee /etc/apt/sources.list.d/php.list</span>
+<span class="s1">    - apt-get update</span>
+<span class="s1">    - apt install -y php7.4 </span>
+<span class="s1">    - apt install -y php7.4-{bcmath,cli,curl,zip,sqlite3,mysql,xml,mbstring}</span>
+<span class="s1">    - wget https://getcomposer.org/composer.phar</span>
+<span class="s1">    - mv composer.phar /usr/bin/composer</span>
+<span class="s1">    - chmod +x /usr/bin/composer</span>
+<span class="s1">    - wget https://get.symfony.com/cli/installer -O - | bash</span>
+<span class="s1">    - mv /root/.symfony/bin/symfony /usr/local/bin/symfony</span>
+<span class="s1">    - composer require symfony/web-server-bundle 4.4</span>
+<span class="s1">    # On ne veut pas de Warning pour les Depreciations de Symfony</span>
+<span class="s1">    - export SYMFONY_DEPRECATIONS_HELPER=disabled</span>
+<span class="s1">    # On test la qualité de notre code</span>
+<span class="s1">    - ./bin/phpunit </span>
+<span class="s1">    # Puis on crée l&#39;</span><span class="n">artefact</span> <span class="n">qui</span> <span class="n">contiendra</span> <span class="n">l</span><span class="s1">&#39;ensemble des fichiers necessaires au fonctionnement de notre site</span>
+<span class="s1">    - rsync -av . --exclude &#39;</span><span class="n">Dockerfile</span><span class="s1">&#39; codequality-results/</span>
+<span class="s1">  artifacts:</span>
+<span class="s1">    paths:</span>
+<span class="s1">      - codequality-results/</span>
+
+<span class="s1">image_job:</span>
+<span class="s1">  image: docker:latest</span>
+<span class="s1">  stage: build</span>
+<span class="s1">  # Appel de la dépendance afin de pouvoir utiliser l&#39;</span><span class="n">artefact</span> <span class="n">construit</span> <span class="n">précédemment</span>
+  <span class="n">dependencies</span><span class="p">:</span> 
+    <span class="o">-</span> <span class="n">build_job</span>
+  <span class="n">script</span><span class="p">:</span>
+    <span class="o">#</span> <span class="k">On</span> <span class="n">construit</span> <span class="n">notre</span> <span class="n">image</span> <span class="n">docker</span> <span class="n">en</span> <span class="n">utilisant</span> <span class="n">l</span><span class="s1">&#39;artefact précédemment crée</span>
+<span class="s1">    - docker build --build-arg ARTIFACT_NAME=&quot;codequality-results/&quot; -t $TAG_COMMIT .</span>
+<span class="s1">    # On se connecte à notre registry</span>
+<span class="s1">    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY</span>
+<span class="s1">    # Et on pousse notre image docker dans notre registry afin de pouvoir l&#39;</span><span class="n">utiliser</span> <span class="n">par</span> <span class="n">la</span> <span class="n">suite</span>
+    <span class="o">-</span> <span class="n">docker</span> <span class="n">push</span> <span class="err">$</span><span class="n">TAG_COMMIT</span>
+
+<span class="n">deploy_staging</span><span class="p">:</span>
+  <span class="o">#</span> <span class="n">Ici</span> <span class="k">on</span> <span class="n">prend</span> <span class="n">une</span> <span class="n">image</span> <span class="n">très</span> <span class="n">light</span> <span class="n">car</span> <span class="n">le</span> <span class="n">seul</span> <span class="n">besoin</span> <span class="n">est</span> <span class="n">de</span> <span class="n">lancer</span> <span class="n">notre</span> <span class="n">conteneur</span> <span class="n">sur</span> <span class="n">la</span> <span class="n">machine</span> <span class="n">distante</span>
+  <span class="n">image</span><span class="p">:</span> <span class="n">alpine</span><span class="p">:</span><span class="n">latest</span>
+  <span class="n">stage</span><span class="p">:</span> <span class="n">deploy</span>
+  <span class="n">script</span><span class="p">:</span>
+    <span class="o">#</span><span class="k">On</span> <span class="n">retire</span> <span class="n">les</span> <span class="n">permissions</span> <span class="n">de</span> <span class="n">tout</span> <span class="n">le</span> <span class="n">monde</span> <span class="n">sauf</span> <span class="n">pour</span> <span class="n">le</span> <span class="n">propriétaire</span> <span class="n">de</span> <span class="n">la</span> <span class="n">clé</span> <span class="n">privée</span><span class="p">.</span> <span class="n">Prérequis</span> <span class="n">necessaire</span> <span class="n">pour</span> <span class="err">é</span><span class="n">viter</span> <span class="n">que</span> <span class="n">SSH</span> <span class="n">ne</span> <span class="n">refuse</span> <span class="n">de</span> <span class="n">travailler</span> <span class="n">avec</span> <span class="n">cette</span> <span class="n">clé</span>
+    <span class="o">-</span> <span class="n">chmod</span> <span class="n">og</span><span class="o">=</span> <span class="err">$</span><span class="n">ID_RSA_RECETTE</span>
+    <span class="o">-</span> <span class="n">apk</span> <span class="k">update</span> <span class="o">&amp;&amp;</span> <span class="n">apk</span> <span class="k">add</span> <span class="n">openssh</span><span class="o">-</span><span class="n">client</span>
+    <span class="o">#</span> <span class="k">On</span> <span class="n">demande</span> <span class="n">d</span><span class="s1">&#39;utiliser le fichier de la clé privée (variable ID_RSA_RECETTE crée de type fichier) et d&#39;</span><span class="n">ajouter</span> <span class="n">automatiquement</span> <span class="n">de</span> <span class="n">nouvelles</span> <span class="n">clés</span> <span class="n">d</span><span class="err">’</span><span class="n">hôte</span> <span class="n">aux</span> <span class="n">fichiers</span> <span class="n">hôtes</span> <span class="n">connus</span> <span class="p">(</span><span class="n">StrictHostKeyChecking</span><span class="o">=</span><span class="k">no</span><span class="p">)</span>
+    <span class="o">-</span> <span class="n">ssh</span> <span class="o">-</span><span class="n">i</span> <span class="err">$</span><span class="n">ID_RSA_RECETTE</span> <span class="o">-</span><span class="n">o</span> <span class="n">StrictHostKeyChecking</span><span class="o">=</span><span class="k">no</span> <span class="err">$</span><span class="n">SERVER_USER</span><span class="o">@</span><span class="err">$</span><span class="n">SERVER_IP_RECETTE</span> <span class="ss">&quot;docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY&quot;</span>
+    <span class="o">-</span> <span class="n">ssh</span> <span class="o">-</span><span class="n">i</span> <span class="err">$</span><span class="n">ID_RSA_RECETTE</span> <span class="o">-</span><span class="n">o</span> <span class="n">StrictHostKeyChecking</span><span class="o">=</span><span class="k">no</span> <span class="err">$</span><span class="n">SERVER_USER</span><span class="o">@</span><span class="err">$</span><span class="n">SERVER_IP_RECETTE</span> <span class="ss">&quot;docker pull $TAG_COMMIT&quot;</span>
+    <span class="o">-</span> <span class="n">ssh</span> <span class="o">-</span><span class="n">i</span> <span class="err">$</span><span class="n">ID_RSA_RECETTE</span> <span class="o">-</span><span class="n">o</span> <span class="n">StrictHostKeyChecking</span><span class="o">=</span><span class="k">no</span> <span class="err">$</span><span class="n">SERVER_USER</span><span class="o">@</span><span class="err">$</span><span class="n">SERVER_IP_RECETTE</span> <span class="ss">&quot;docker container rm -f testSRY || true&quot;</span>
+    <span class="o">-</span> <span class="n">ssh</span> <span class="o">-</span><span class="n">i</span> <span class="err">$</span><span class="n">ID_RSA_RECETTE</span> <span class="o">-</span><span class="n">o</span> <span class="n">StrictHostKeyChecking</span><span class="o">=</span><span class="k">no</span> <span class="err">$</span><span class="n">SERVER_USER</span><span class="o">@</span><span class="err">$</span><span class="n">SERVER_IP_RECETTE</span> <span class="ss">&quot;docker run -d -p 8081:8889 --name testSRY $TAG_COMMIT&quot;</span>
+  <span class="n">environment</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">PreProduction</span>
+    <span class="n">url</span><span class="p">:</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">recette</span><span class="p">.</span><span class="n">devops</span><span class="p">.</span><span class="n">oc</span><span class="p">:</span><span class="mi">8081</span><span class="o">/</span>
+  <span class="k">only</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">master</span>
+
+<span class="n">deploy_prod</span><span class="p">:</span>
+  <span class="n">image</span><span class="p">:</span> <span class="n">alpine</span><span class="p">:</span><span class="n">latest</span>
+  <span class="n">stage</span><span class="p">:</span> <span class="n">deploy</span>
+  <span class="n">script</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">chmod</span> <span class="n">og</span><span class="o">=</span> <span class="err">$</span><span class="n">ID_RSA_PRODUCTION</span>
+    <span class="o">-</span> <span class="n">apk</span> <span class="k">update</span> <span class="o">&amp;&amp;</span> <span class="n">apk</span> <span class="k">add</span> <span class="n">openssh</span><span class="o">-</span><span class="n">client</span>
+    <span class="o">-</span> <span class="n">ssh</span> <span class="o">-</span><span class="n">i</span> <span class="err">$</span><span class="n">ID_RSA_PRODUCTION</span> <span class="o">-</span><span class="n">o</span> <span class="n">StrictHostKeyChecking</span><span class="o">=</span><span class="k">no</span> <span class="err">$</span><span class="n">SERVER_USER</span><span class="o">@</span><span class="err">$</span><span class="n">SERVER_IP_PRODUCTION</span> <span class="ss">&quot;docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY&quot;</span>
+    <span class="o">-</span> <span class="n">ssh</span> <span class="o">-</span><span class="n">i</span> <span class="err">$</span><span class="n">ID_RSA_PRODUCTION</span> <span class="o">-</span><span class="n">o</span> <span class="n">StrictHostKeyChecking</span><span class="o">=</span><span class="k">no</span> <span class="err">$</span><span class="n">SERVER_USER</span><span class="o">@</span><span class="err">$</span><span class="n">SERVER_IP_PRODUCTION</span> <span class="ss">&quot;docker pull $TAG_COMMIT&quot;</span>
+    <span class="o">-</span> <span class="n">ssh</span> <span class="o">-</span><span class="n">i</span> <span class="err">$</span><span class="n">ID_RSA_PRODUCTION</span> <span class="o">-</span><span class="n">o</span> <span class="n">StrictHostKeyChecking</span><span class="o">=</span><span class="k">no</span> <span class="err">$</span><span class="n">SERVER_USER</span><span class="o">@</span><span class="err">$</span><span class="n">SERVER_IP_PRODUCTION</span> <span class="ss">&quot;docker container rm -f testSRY || true&quot;</span>
+    <span class="o">-</span> <span class="n">ssh</span> <span class="o">-</span><span class="n">i</span> <span class="err">$</span><span class="n">ID_RSA_PRODUCTION</span> <span class="o">-</span><span class="n">o</span> <span class="n">StrictHostKeyChecking</span><span class="o">=</span><span class="k">no</span> <span class="err">$</span><span class="n">SERVER_USER</span><span class="o">@</span><span class="err">$</span><span class="n">SERVER_IP_PRODUCTION</span> <span class="ss">&quot;docker run -d -p 8082:8889 --name testSRY $TAG_COMMIT&quot;</span>
+  <span class="n">environment</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Production</span>
+    <span class="n">url</span><span class="p">:</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">production</span><span class="p">.</span><span class="n">devops</span><span class="p">.</span><span class="n">oc</span><span class="p">:</span><span class="mi">8082</span><span class="o">/</span>
+  <span class="o">#</span> <span class="n">Le</span> <span class="ss">&quot;when&quot;</span> <span class="n">permet</span> <span class="n">d</span><span class="err">&#39;</span><span class="n">indiquer</span> <span class="n">que</span> <span class="n">nous</span> <span class="n">souhaitons</span> <span class="n">valider</span> <span class="n">humainement</span> <span class="n">avant</span> <span class="n">livraison</span> <span class="n">en</span> <span class="n">production</span>
+  <span class="k">when</span><span class="p">:</span> <span class="n">manual</span>
+  <span class="k">only</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">master</span>
+</code></pre></div>
+
+
+<h2>Déploiement</h2>
+<p>Pour le déploiement en PréProduction, ce dernier est automatique.
+Par contre, pour le deployer en Production, il vous faudra cliquer manuellement sur le bouton adéquate.
+Cela permet de verifier que l'ensemble du code fonctionne correctement</p>
+<h2>Rollback</h2>
+<p>Tout comme le déploiement en Production, le Rollback est une action manuelle que vous pouvez réaliser simplement par un clique sur le bouton suivant :</p>
+<p><img alt="rollback001" src="imagesperso/projet06/rollback001.png"></p>
+<p><a href="#sommaire">Revenir en haut de page</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://ricky1981.github.io/blog/tag/projet.html">projet</a>
+      <a href="https://ricky1981.github.io/blog/tag/openclassrooms.html">OpenClassRooms</a>
+      <a href="https://ricky1981.github.io/blog/tag/gitlab.html">gitlab</a>
+      <a href="https://ricky1981.github.io/blog/tag/cicd.html">CI/CD</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>&copy; 2020 Test Copyright</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Mon Blog Freelance ",
+  "url" : "https://ricky1981.github.io/blog",
+  "image": "",
+  "description": ""
+}
+</script>
+
+
+</body>
+</html>
