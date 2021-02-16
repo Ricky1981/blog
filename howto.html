@@ -112,7 +112,7 @@
       
     <h1 id="howto">HowTo</h1>
     <p>
-      Posted on Fri 11 December 2020 in <a href="https://ricky1981.github.io/blog/category/howto.html">HowTo</a>
+      Posted on ven. 11 décembre 2020 in <a href="https://ricky1981.github.io/blog/category/howto.html">HowTo</a>
 
     </p>
   </header>
@@ -163,19 +163,19 @@ Mais en suivant les étapes suivantes, tout se passera bien :</p>
 <li>Se placer dans ce repertoire : <code>cd /etc/gitlab-runner/certs</code></li>
 <li>Créer les clés privés et publiques : </li>
 </ol>
-<div class="highlight"><pre><span></span><code>openssl req -x509 -out gitlab.devops.oc.crt -keyout gitlab.devops.oc.key -newkey rsa:2048 -nodes -sha256 -subj <span class="s1">&#39;/CN=gitlab.devops.oc&#39;</span> -extensions EXT -config &lt;<span class="o">(</span> <span class="nb">printf</span> <span class="s2">&quot;[dn]\nCN=gitlab.devops.oc\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:gitlab.devops.oc\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth&quot;</span><span class="o">)</span>
-</code></pre></div>
+<div class="highlight"><pre><span></span>openssl req -x509 -out gitlab.devops.oc.crt -keyout gitlab.devops.oc.key -newkey rsa:2048 -nodes -sha256 -subj <span class="s1">&#39;/CN=gitlab.devops.oc&#39;</span> -extensions EXT -config &lt;<span class="o">(</span> <span class="nb">printf</span> <span class="s2">&quot;[dn]\nCN=gitlab.devops.oc\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:gitlab.devops.oc\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth&quot;</span><span class="o">)</span>
+</pre></div>
 
 
 <ol>
 <li>Sortir du conteneur puis sur la VM lancer les commandes suivantes :</li>
 </ol>
-<div class="highlight"><pre><span></span><code>vagrant@devops:~$ <span class="nb">cd</span> /srv/gitlab-runner/config/certs/ 
+<div class="highlight"><pre><span></span>vagrant@devops:~$ <span class="nb">cd</span> /srv/gitlab-runner/config/certs/ 
 
 vagrant@devops:/srv/gitlab-runner/config/certs$ sudo cp -a gitlab.devops.oc.* /srv/gitlab/config/ssl/ 
 
 vagrant@devops:/srv/gitlab-runner/config/certs$ sudo vim /srv/gitlab/config/gitlab.rb 
-</code></pre></div>
+</pre></div>
 
 
 <ol>
@@ -186,7 +186,7 @@ vagrant@devops:/srv/gitlab-runner/config/certs$ sudo vim /srv/gitlab/config/gitl
 <p><a href="#sommaire">Revenir au sommaire</a></p>
 <h3>Installation du runner <a name="runner"></a></h3>
 <p>Une fois la partie précédent réalsiée, nous relançons le runner en ajoutant un agent :</p>
-<div class="highlight"><pre><span></span><code>vagrant@devops:/srv/gitlab-runner/config/certs$ docker <span class="nb">exec</span> -ti gitlab-runner bash 
+<div class="highlight"><pre><span></span>vagrant@devops:/srv/gitlab-runner/config/certs$ docker <span class="nb">exec</span> -ti gitlab-runner bash 
 
 root@00de709eafcf:/# gitlab-runner restart
 root@00de709eafcf:/# gitlab-runner register 
@@ -214,7 +214,7 @@ Enter the default Docker image <span class="o">(</span><span class="k">for</span
 docker:stable 
 
 Runner registered successfully. 
-</code></pre></div>
+</pre></div>
 
 
 <p>Nous pouvons voir le résultat directement sur notre site GitLab dans les paramètres CI/CD, Section "Runner"</p>
@@ -227,7 +227,7 @@ Runner registered successfully.
 <li>Puis nous generons la configuration de notre site via l’outils quickstart de Pelican : <code>pelican-quickstart</code></li>
 <li>Nous renseignons les différents champs :</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="o">(</span>pelican<span class="o">)</span> vagrant@devops:~/virtualenvs/pelican/freelanceBlog$ pelican-quickstart   
+<div class="highlight"><pre><span></span><span class="o">(</span>pelican<span class="o">)</span> vagrant@devops:~/virtualenvs/pelican/freelanceBlog$ pelican-quickstart   
 
 This script will <span class="nb">help</span> you create a new Pelican-based website. 
 
@@ -251,7 +251,7 @@ Please answer the following questions so this script can generate the files need
 &gt; Do you want to upload your website using GitHub Pages? <span class="o">(</span>y/N<span class="o">)</span>  
 
 Done. Your new project is available at /home/vagrant/virtualenvs/pelican/freelanceBlog 
-</code></pre></div>
+</pre></div>
 
 
 <ol>
@@ -289,7 +289,7 @@ Done. Your new project is available at /home/vagrant/virtualenvs/pelican/freelan
 <h2>Push vers notre repository GitLab <a name="push"></a></h2>
 <p>Tout d'abord, sur notre VM, nous allons créer notre clé SSH afin de pouvoir l'interconnecter avec GitLab.
 Pour celà :</p>
-<div class="highlight"><pre><span></span><code>vagrant@devops:~/virtualenvs/pelican/freelanceBlog$ ssh-keygen -t rsa -b <span class="m">4096</span> -C <span class="s2">&quot;Seb&quot;</span>  
+<div class="highlight"><pre><span></span>vagrant@devops:~/virtualenvs/pelican/freelanceBlog$ ssh-keygen -t rsa -b <span class="m">4096</span> -C <span class="s2">&quot;Seb&quot;</span>  
 
 Generating public/private rsa key pair. 
 Enter file in which to save the key <span class="o">(</span>/home/vagrant/.ssh/id_rsa<span class="o">)</span>:  
@@ -299,17 +299,17 @@ Your identification has been saved in /home/vagrant/.ssh/id_rsa.
 Your public key has been saved in /home/vagrant/.ssh/id_rsa.pub. 
 The key fingerprint is: 
 SHA256:V1Lnvze2GRM1waYUvI4V/mu4v8kD4D11f9LV7RRVCjQ Seb 
-</code></pre></div>
+</pre></div>
 
 
 <p>Etant donné que nous avons fait une redirection du port SSH dans notre conteneur, il faut le faire comprendre à SSH. </p>
 <p>Pour cela, on crée le fichier ~/.ssh/config et on y renseigne les informations suivantes : </p>
-<div class="highlight"><pre><span></span><code>Host gitlab.devops.oc 
+<div class="highlight"><pre><span></span>Host gitlab.devops.oc 
 Hostname gitlab.devops.oc 
 PreferredAuthentications publickey 
 IdentityFile ~/.ssh/id_rsa 
 Port <span class="m">5822</span> 
-</code></pre></div>
+</pre></div>
 
 
 <p>Ensuite, nous ajoutons notre clé public dans GitLab.
@@ -338,7 +338,7 @@ Quand cela est fait, nous pouvons réaliser le remote sur notre repository et po
 <li>pelican-themes -v -l --&gt; pour voir les thèmes installés</li>
 <li>Et on edite le fichier pelicanconf.py pour rajouter le theme :</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+<div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*- #</span>
 
 <span class="nv">AUTHOR</span> <span class="o">=</span> <span class="s1">&#39;Seb&#39;</span>
@@ -370,7 +370,7 @@ Quand cela est fait, nous pouvons réaliser le remote sur notre repository et po
 <span class="nv">SOCIAL</span> <span class="o">=</span> <span class="o">((</span><span class="s1">&#39;Linkedin&#39;</span>, <span class="s1">&#39;https://www.linkedin.com/in/sebastien-rykala-7767b81ba/&#39;</span><span class="o">)</span>,<span class="o">)</span>
 
 <span class="nv">DEFAULT_PAGINATION</span> <span class="o">=</span> <span class="m">10</span>
-</code></pre></div>
+</pre></div>
 
 
 <ol>
