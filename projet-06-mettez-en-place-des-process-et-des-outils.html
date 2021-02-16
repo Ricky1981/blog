@@ -121,7 +121,7 @@
 
   <div>
     <p>Nous mettrons en place dans cet article un pipeline quasi complet sur un environnement local.
-Pour cela plusieurs étapes seront faites :
+Pour cela plusieurs étapes seront faites :<br>
 - <a href="#cert">Création d'un certificat</a><br>
 - <a href="#gitlab">Installation de gitlab en local sur une VM Vagrant</a><br>
 - <a href="#runner">Installation du gitlab-runner de PréProduction sur une autre VM</a><br>
@@ -654,11 +654,11 @@ deployer@recette:/home/vagrant$
   <span class="n">TAG_COMMIT</span><span class="p">:</span> <span class="err">$</span><span class="n">CI_REGISTRY_IMAGE</span><span class="o">/</span><span class="err">$</span><span class="n">CI_COMMIT_REF_NAME</span><span class="p">:</span><span class="err">$</span><span class="n">CI_COMMIT_SHORT_SHA</span>
 
 <span class="n">build_job</span><span class="p">:</span>
-  <span class="o">#</span> <span class="k">On</span> <span class="n">prend</span> <span class="n">la</span> <span class="n">même</span> <span class="n">image</span> <span class="n">que</span> <span class="n">celle</span> <span class="n">utilisée</span> <span class="n">dans</span> <span class="n">le</span> <span class="n">Vagrantfile</span> <span class="n">pour</span> <span class="err">ê</span><span class="n">tre</span> <span class="n">iso</span> <span class="err">à</span> <span class="n">l</span><span class="err">\</span><span class="s1">&#39;environnement de travail de Sergio</span>
+  <span class="o">#</span> <span class="k">On</span> <span class="n">prend</span> <span class="n">la</span> <span class="n">même</span> <span class="n">image</span> <span class="n">que</span> <span class="n">celle</span> <span class="n">utilisée</span> <span class="n">dans</span> <span class="n">le</span> <span class="n">Vagrantfile</span> <span class="n">pour</span> <span class="err">ê</span><span class="n">tre</span> <span class="n">iso</span> <span class="err">à</span> <span class="n">l</span><span class="s1">&#39;&#39;&#39;environnement de travail de Sergio</span>
 <span class="s1">  image: debian:buster-slim</span>
 <span class="s1">  stage: test</span>
 <span class="s1">  script:</span>
-<span class="s1">    # On lance l\&#39;</span><span class="n">installation</span> <span class="n">des</span> <span class="n">packages</span> <span class="n">nécessaires</span> <span class="n">toujours</span> <span class="n">pour</span> <span class="err">ê</span><span class="n">tre</span> <span class="n">iso</span> <span class="err">à</span> <span class="n">l</span><span class="err">\</span><span class="s1">&#39;environnement de Sergio</span>
+<span class="s1">    # On lance l&#39;&#39;&#39;</span><span class="n">installation</span> <span class="n">des</span> <span class="n">packages</span> <span class="n">nécessaires</span> <span class="n">toujours</span> <span class="n">pour</span> <span class="err">ê</span><span class="n">tre</span> <span class="n">iso</span> <span class="err">à</span> <span class="n">l</span><span class="s1">&#39;&#39;&#39;environnement de Sergio</span>
 <span class="s1">    - apt-get update</span>
 <span class="s1">    - apt -y install rsync wget unzip lsb-release apt-transport-https ca-certificates</span>
 <span class="s1">    - wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg</span>
@@ -676,7 +676,7 @@ deployer@recette:/home/vagrant$
 <span class="s1">    - export SYMFONY_DEPRECATIONS_HELPER=disabled</span>
 <span class="s1">    # On test la qualité de notre code</span>
 <span class="s1">    - ./bin/phpunit </span>
-<span class="s1">    # Puis on crée l\&#39;</span><span class="n">artefact</span> <span class="n">qui</span> <span class="n">contiendra</span> <span class="n">l</span><span class="err">\</span><span class="s1">&#39;ensemble des fichiers necessaires au fonctionnement de notre site</span>
+<span class="s1">    # Puis on crée l&#39;&#39;&#39;</span><span class="n">artefact</span> <span class="n">qui</span> <span class="n">contiendra</span> <span class="n">l</span><span class="s1">&#39;&#39;&#39;ensemble des fichiers necessaires au fonctionnement de notre site</span>
 <span class="s1">    - rsync -av . --exclude &#39;</span><span class="n">Dockerfile</span><span class="s1">&#39; codequality-results/</span>
 <span class="s1">  artifacts:</span>
 <span class="s1">    paths:</span>
@@ -685,7 +685,7 @@ deployer@recette:/home/vagrant$
 <span class="s1">image_job:</span>
 <span class="s1">  image: docker:latest</span>
 <span class="s1">  stage: build</span>
-<span class="s1">  # Appel de la dépendance afin de pouvoir utiliser l\&#39;</span><span class="n">artefact</span> <span class="n">construit</span> <span class="n">précédemment</span>
+<span class="s1">  # Appel de la dépendance afin de pouvoir utiliser l&#39;&#39;&#39;</span><span class="n">artefact</span> <span class="n">construit</span> <span class="n">précédemment</span>
   <span class="n">dependencies</span><span class="p">:</span> 
     <span class="o">-</span> <span class="n">build_job</span>
   <span class="n">script</span><span class="p">:</span>
