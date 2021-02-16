@@ -123,7 +123,133 @@
     <p>Le but de ce premier "vrai" projet du parcours "Expert DevOps" d'OpenClassRooms est de mettre en place un environnement de développement de manière automatique en local sur notre poste. 
 En effet, la démarche DevOps est constituée de nombreuses tâches, au service des différent pôles informatiques, développeurs, exploitation, testing, etc. 
 C'est pourquoi il est important de pouvoir créer un environnement qui, à l'image des serveurs cibles, permet aux développeurs de travailler sur un environnement qui reproduit les conditions dans lesquelles leur code fonctionnera.</p>
-<p>Voici ci-dessous le mode opératoire pour réaliser une machine virtuelle grâce à Vagrant.</p>
+<p>Nous vous proposons ici deux méthodes pour utiliser une machine virtuelle sous Vagrant :
+- <a href="#cas1">Utiliser une machine entièrement fonctionnelle</a> 
+- <a href="#cas2">Créer vous-même votre environnement</a></p>
+<h1>Utiliser une machine entièrement fonctionnelle <a name="cas1"></a></h1>
+<h2>Prérequis <a name="prerequis"></a></h2>
+<ul>
+<li><a href="https://git-scm.com/book/fr/v2/D%C3%A9marrage-rapide-Installation-de-Git">Git</a> ~&gt; 2.20</li>
+<li><a href="https://www.vagrantup.com/docs/installation">Vagrant</a> ~&gt; 2.2.6</li>
+<li>Plugin scp de vagrant : <code>vagrant plugin install vagrant-scp</code> </li>
+<li>Plugin vbguest de vagrant : <code>vagrant plugin install vagrant-vbguest</code></li>
+<li><a href="https://www.virtualbox.org/wiki/Downloads">VirtualBox ainsi que son pack d'extension</a> ~&gt; 6.1.16</li>
+</ul>
+<h2>Installation de la machine virtuelle "vierge"</h2>
+<ol>
+<li>Créer un repertoire sur poste, par exemple "vagrant" : <code>mkdir ~/vagrant</code></li>
+<li>Se déplacer dans le répertoire "vagrant" : <code>cd ~/vagrant</code></li>
+<li>Récupérer la dernière version du repository en lançant la commande suivante : <code>git clone --depth 1 https://github.com/Ricky1981/OpenClassRooms_Projet3_Vagrant.git .</code></li>
+<li>Lancer la construction via la commande <code>vagrant up</code></li>
+<li>Après un certain temps, la machine virtuelle est créée et il vous est possible de prendre la main à distance en ssh via la commande <code>vagrant ssh</code> (si vous souhaitez une autre méthode de connection, merci de consulter la section <a href="#ssh">suivante</a>)</li>
+</ol>
+<h2>Test des différents outils sur la machine virtuelle</h2>
+<p>Les composants du tableaux ci-dessous sont les composants qui ont été ajouté dans le Vagrantfile et ne proviennent donc pas de l'image par défaut.
+Toutes les commandes ci-dessous sont à faire une fois la connection SSH sur l'hôte distant est opérationnel :</p>
+<table>
+<thead>
+<tr>
+<th>Composant</th>
+<th>Commande</th>
+<th>Retour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Editeur de texte</td>
+<td><code>vim --version</code></td>
+<td>VIM - Vi IMproved 8.1</td>
+</tr>
+<tr>
+<td>Ansible</td>
+<td><code>ansible --version</code></td>
+<td>ansible 2.9.15</td>
+</tr>
+<tr>
+<td>Docker</td>
+<td><code>docker --version</code></td>
+<td>Docker version 19.03.14</td>
+</tr>
+</tbody>
+</table>
+<h2><a name="ssh"></a> Configuration SSH</h2>
+<p>Ce paragraphe vous propose de configurer SSH sur votre poste afin d'utiliser la façon commune à l'utilisation de la commande ssh.
+Vagrant se connecte parfaitement via la commande <code>vagrant ssh</code>. 
+Cependant, si vous souhaitez utiliser la commande <code>ssh [user]@[IP]</code>, il faudra ajouter des informations dans le fichier ~/.ssh/config.
+Ci-dessous les étapes à respecter : 
+1°/ Nous consultons la configuration ssh de vagrant via la commande <code>vagrant ssh-config</code> :</p>
+<div class="highlight"><pre><span></span><code><span class="err">Host default</span>
+<span class="err">  HostName 127.0.0.1</span>
+<span class="err">  User vagrant</span>
+<span class="err">  Port 2222</span>
+<span class="err">  UserKnownHostsFile /dev/null</span>
+<span class="err">  StrictHostKeyChecking no</span>
+<span class="err">  PasswordAuthentication no</span>
+<span class="err">  IdentityFile /home/seb/.vagrant.d/insecure_private_key</span>
+<span class="err">  IdentitiesOnly yes</span>
+<span class="err">  LogLevel FATAL`</span>
+</code></pre></div>
+
+
+<p>2°/ Vagrant nous affiche alors la configuration qu'il utilise. Comme on connait l'adresse IP de la machine et le chemin vers sa clé privée, on peut se rendre dans le fichier <code>~/.ssh/config</code> pour ajouter une configuration :</p>
+<div class="highlight"><pre><span></span><code><span class="err">Host 192.168.33.10</span>
+<span class="err">  User vagrant</span>
+<span class="err">  Port 22</span>
+<span class="err">  UserKnownHostsFile /dev/null</span>
+<span class="err">  StrictHostKeyChecking no</span>
+<span class="err">  PasswordAuthentication no</span>
+<span class="err">  IdentityFile /home/seb/.vagrant.d/insecure_private_key</span>
+<span class="err">  IdentitiesOnly yes</span>
+<span class="err">  LogLevel FATAL</span>
+</code></pre></div>
+
+
+<p>La configuration sera ainsi utilisée avec la bonne clé privée et la connexion peut être établie via la commande <code>ssh [user]@[IP]</code></p>
+<h1>Créer vous-même votre environnement <a name="cas2"></a></h1>
+<p>Ici, nous allons créer notre premiere version du fichier “Vagrantfile”.
+Les prérequis sont les mêmes que pour la <a href="#prerequis">première partie</a> de cette page 
+Pour cela, nous lançons juste la commande suivante afin de générer le fichier “initiale”  </p>
+<div class="highlight"><pre><span></span><code>$ vagrant init 
+A <span class="sb">`</span>Vagrantfile<span class="sb">`</span> has been placed in this directory. You are now ready to <span class="sb">`</span>vagrant up<span class="sb">`</span> your first virtual environment! Please <span class="nb">read</span> the comments in the Vagrantfile as well as documentation on 
+<span class="sb">`</span>vagrantup.com<span class="sb">`</span> <span class="k">for</span> more information on using Vagrant. 
+</code></pre></div>
+
+
+<h2>Création du Vagrantfile de ma distribution</h2>
+<p>Mon choix s’est porté sur un Debian 10.6.0 en version LXQt Desktop car légère</p>
+<h3>Création de la VM dans VirtualBox</h3>
+<p>Notre machine s’intitulera “vagrant-debian10.6.0”</p>
+<p><img alt="VirtualBox001" src="imagesperso/projet03/VirtualBox001.png"></p>
+<p>L’utilisateur “vagrant” est créé sur cette VM avec login = mot de passe</p>
+<p>Une fois l’OS installé sur cette VM, on configure la redirection de port : </p>
+<p><img alt="VirtualBox002" src="imagesperso/projet03/VirtualBox002.png"></p>
+<p>Enfin, lancer la VM et se connecter dessus. 
+Passer ensuite en root et installer SSH ainsi que sudo via un terminal : </p>
+<div class="highlight"><pre><span></span><code>vagrant@vagrant-debian10:~$ su 
+Mot de passe : 
+root@vagrant-debian10:~# apt-get install ssh sudo 
+</code></pre></div>
+
+
+<p>Nous rajoutons également le package suivant afin de pouvoir ajouter des repository si besoin par la suite (apt-add-repository) car par défaut, n’est pas installé : </p>
+<div class="highlight"><pre><span></span><code>sudo apt-get install software-properties-common 
+</code></pre></div>
+
+
+<p>On va ensuite modifier la configuration du fichier sudoers pour autoriser tous les utilisateurs du groupe admin à sudoer sans mot de passe. </p>
+<div class="highlight"><pre><span></span><code> <span class="c1"># visudo </span>
+</code></pre></div>
+
+
+<p>Nous ajoutons l’utilisateur vagrant :</p>
+<div class="highlight"><pre><span></span><code>vagrant   <span class="nv">ALL</span><span class="o">=(</span>ALL<span class="o">)</span>   NOPASSWD: ALL 
+</code></pre></div>
+
+
+<p>Enfin, on teste notre utilisateur vagrant afin de vérifier que le mot de passe ne soit plus necessaire.  </p>
+<div class="highlight"><pre><span></span><code><span class="c1"># exit </span>
+$ sudo ls 
+</code></pre></div>
   </div>
   <div class="tag-cloud">
     <p>
