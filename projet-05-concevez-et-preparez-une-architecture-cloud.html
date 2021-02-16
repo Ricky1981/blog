@@ -139,23 +139,72 @@ Nous partirons ici sur une migration dite "lift and shift".</p>
 <tr>
 <td>WebFront</td>
 <td><code>Linux / Ubuntu 16.04LTS</code></td>
-<td>- NodeJS v8.9.4    - PM2 2.9.3</td>
-<td>4C/8T  16Go RAM  100Go SSD</td>
+<td>NodeJS v8.9.4 ; PM2 2.9.3</td>
+<td>4C/8T ; 16Go RAM ; 100Go SSD</td>
 </tr>
 <tr>
-<td>Ansible</td>
-<td><code>ansible --version</code></td>
-<td>ansible 2.9.15</td>
-<td>sdf</td>
+<td>WebAPI</td>
+<td><code>Linux / Ubuntu 16.04LTS</code></td>
+<td>NodeJS v8.9.4 ; PM2 2.9.3</td>
+<td>4C/8T ; 8Go RAM ; 100Go SSD</td>
 </tr>
 <tr>
-<td>Docker</td>
-<td><code>docker --version</code></td>
-<td>Docker version 19.03.14</td>
-<td>dsg</td>
+<td>ElasticSearch Cluster</td>
+<td><code>Linux / Debian 8</code></td>
+<td>Elasticsearch 2.4.4</td>
+<td>2C/4T ; 14Go RAM ; 1To SSD</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td><code>Linux / Debian 9</code></td>
+<td>Kubernetes 1.8.1</td>
+<td>4C/8T ; 32Go RAM ; 64To SSD</td>
 </tr>
 </tbody>
 </table>
+<h1>Proposition de l'architecture dans AWS</h1>
+<p>Nous rappelons que le but ici est de partir sur une migration simple avec les services de "base" que AWS peut proposer.
+Nous ne partirons donc pas dans cette premiere version sur du Route53, CloudFront et ElasticCache.</p>
+<p>Voici donc le schéma en mode "lift and shift" tout en profitant des premiers avantages du Cloud AWS avec ses services managés :</p>
+<p><img alt="DAT002" src="imagesperso/projet05/DAT002.png"></p>
+<h2>Explication (rapide) des différents services de cette architecture</h2>
+<ul>
+<li>EC2 :​ Elastic Compute Cloud. C’est un service de machine virtuelle de base.​  </li>
+<li>EBS :​ Elastic Block Store. C’est un type de volume conçu pour offrir des performances élevées avec des temps de réponse rapides.​  </li>
+<li>RDS : Relational Database Service. C’est un service qui nous permet d’utiliser plusieurs moteurs de base de données telles que MySQL, PostgreSQL, ORACLE, etc.​  </li>
+<li>S3 :​ Simple Storage Service. C’ est un service de stockage de données avec versionning, sans limitation de place, etc.​  </li>
+<li>EKS : Elastic Kubernetes Service. C’est un service entièrement managé qui nous permet d’utiliser Kubernetes sur AWS.​  </li>
+<li>ElasticSearch Service :​ C’est un service entièrement managé qui vous permet d’utiliser ElasticSearch directement sans aucune installation.  ​</li>
+<li>VPC :​ Virtual Private Cloud. Le VPC est un sous-réseau qui vous permet de "regrouper" vos serveurs entre eux, pour qu'ils communiquent plus facilement et en toute sécurité.  </li>
+</ul>
+<h2>Opérations régulières sur ces différents services</h2>
+<p><em>Pour les instances EC2 :​<br>
+</em>Installation complète à faire​
+  <em>Backup à réaliser ​
+  </em>Mise à jour des différents logiciels​  </p>
+<p>​<em>Pour RDS MySQL :​<br>
+</em>Pas d’installation MySQL à réaliser​
+  <em>Mise à jour du logiciel réalisée par AWS​
+  </em>Sauvegarde automatique tous les jours sur les 7 derniers jours​
+  *Restauration possible à la seconde près​  </p>
+<p><em>Pour les services Managé (EKS / ElasticSearch Services) :​
+  </em>Backup non nécessaire​
+  *Patch de sécurité transparent</p>
+<h2>Plan de migration proposée (la plus simple)</h2>
+<p>Nous partons ici sur une migration dites à froid car c'est la plus simple à gérer même si nous aurions pu envisager une méthode de type blue/green</p>
+<p>Voici donc les étapes pour réaliser cette migration à froid :</p>
+<p><em>Création des différentes instances (EC2 / RDS / etc.)​
+</em>Copie des données​
+<em>Transfert des données​
+</em>Test de l’application​
+<em>Synchronisation des données quotidiennes jusqu’au jour de la migration​
+</em>Jour J : ​
+  <em>Coupure de service de l’ancienne infrastructure​
+  </em>Dernière synchronisation des données​
+  <em>Bascule DNS sur les nouvelles Ips​
+  </em>Tests de l’ensemble des fonctionnalités sur AWS :​
+   <em>Si OK : Ouverture du service sur AWS pour les clients​
+   </em>Si KO : Rollback DNS et Réouverture du service sur l’ancienne infrastructure pour les clients</p>
   </div>
   <div class="tag-cloud">
     <p>
