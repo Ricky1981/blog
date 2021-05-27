@@ -38,7 +38,7 @@
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://ricky1981.github.io/blog/projet-06-mettez-en-place-des-process-et-des-outils.html"/>
 <meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2021-03-04 00:00:00+01:00"/>
+<meta property="article:published_time" content="2021-02-16 00:00:00+01:00"/>
 <meta property="article:modified_time" content=""/>
 <meta property="article:author" content="https://ricky1981.github.io/blog/author/seb.html">
 <meta property="article:section" content="Accueil"/>
@@ -113,7 +113,7 @@
       
     <h1 id="projet-06-mettez-en-place-des-process-et-des-outils">Projet 06 - Mettez en place des process et des outils</h1>
     <p>
-      Posted on Thu 04 March 2021 in <a href="https://ricky1981.github.io/blog/category/accueil.html">Accueil</a>
+      Posted on Tue 16 February 2021 in <a href="https://ricky1981.github.io/blog/category/accueil.html">Accueil</a>
 
     </p>
   </header>
@@ -144,7 +144,7 @@ Generating RSA private key, <span class="m">2048</span> bit long modulus <span c
 .....+++++ 
 e is <span class="m">65537</span> <span class="o">(</span>0x010001<span class="o">)</span> 
 Enter pass phrase <span class="k">for</span> ca.key: 
-<span class="m">139925303420224</span>:error:28078065:UI routines:UI_set_result_ex:result too small:../crypto/ui/ui_lib.c:905:You must <span class="nb">type</span> in <span class="m">4</span> to <span class="m">1023</span> characters 
+<span class="m">139925303420224</span>:error:28078065:UI routines:UI_set_result_ex:result too small:../crypto/ui/ui_lib.c:905:You must <span class="nb">type</span> <span class="k">in</span> <span class="m">4</span> to <span class="m">1023</span> characters 
 Enter pass phrase <span class="k">for</span> ca.key: 
 <span class="m">139925303420224</span>:error:2807106B:UI routines:UI_process:processing error:../crypto/ui/ui_lib.c:545:while reading strings 
 Enter pass phrase <span class="k">for</span> ca.key: 
@@ -185,7 +185,6 @@ Getting Private key
 Enter pass phrase <span class="k">for</span> ca.key:  
 </code></pre></div>
 
-
 <p>Vous avez maintenant un certificat que vous pouvez utiliser pour signer tous vos autres certificats. Le certificat est dans ca.crt et sa clé privée dans ca.key.</p>
 <p>Maintenant faites les différents certificats pour votre organisation.
 Créez une clé sans mot de passe pour utiliser sur les serveurs. Ci-dessous, la première ligne est obligatoire car le mot de passe est obligatoire à la création.
@@ -200,11 +199,10 @@ Verifying - Enter pass phrase <span class="k">for</span> gitlab.devops.oc.key:
 
 seb:CA$ openssl rsa -in gitlab.devops.oc.key -out gitlab.devops.oc.key 
 Enter pass phrase <span class="k">for</span> gitlab.devops.oc.key: 
-<span class="m">140682069476672</span>:error:28078065:UI routines:UI_set_result_ex:result too small:../crypto/ui/ui_lib.c:905:You must <span class="nb">type</span> in <span class="m">4</span> to <span class="m">1023</span> characters 
+<span class="m">140682069476672</span>:error:28078065:UI routines:UI_set_result_ex:result too small:../crypto/ui/ui_lib.c:905:You must <span class="nb">type</span> <span class="k">in</span> <span class="m">4</span> to <span class="m">1023</span> characters 
 Enter pass phrase <span class="k">for</span> gitlab.devops.oc.key: 
 writing RSA key 
 </code></pre></div>
-
 
 <p>Ensuite on relance une commande pour faire une demande de certificat et une autre pour signez notre certificat avec notre autorité :</p>
 <div class="highlight"><pre><span></span><code>seb:CA$ openssl req -new -key gitlab.devops.oc.key -out gitlab.devops.oc.csr 
@@ -234,20 +232,17 @@ Getting CA Private Key
 Enter pass phrase <span class="k">for</span> ca.key: 
 </code></pre></div>
 
-
 <p>Vous avez votre nouveau certificat signé par votre autorité dans gitlab.devops.oc.crt et sa clé privée directement utilisable dans gitlab.devops.oc.key (sans mot de passe pour utilisation directe sur un serveur).</p>
 <p>Il est temps que vos utilisateurs vous fassent confiance. Pour cela distribuez votre fichier ca.crt et ajoutez le à vos navigateurs.</p>
 <p>Dans firefox :</p>
-<div class="highlight"><pre><span></span><code><span class="err">Outils -&gt; options -&gt; avancé -&gt; chiffrement -&gt; afficher les certificats -&gt; autorités -&gt; importer</span>
-<span class="err">Puis sélectionnez votre certificat et utilisez pour les site web.</span>
+<div class="highlight"><pre><span></span><code><span class="n">Outils</span> <span class="o">-&gt;</span> <span class="n">options</span> <span class="o">-&gt;</span> <span class="n">avancé</span> <span class="o">-&gt;</span> <span class="n">chiffrement</span> <span class="o">-&gt;</span> <span class="n">afficher</span> <span class="n">les</span> <span class="n">certificats</span> <span class="o">-&gt;</span> <span class="n">autorités</span> <span class="o">-&gt;</span> <span class="n">importer</span>
+<span class="n">Puis</span> <span class="n">sélectionnez</span> <span class="n">votre</span> <span class="n">certificat</span> <span class="n">et</span> <span class="n">utilisez</span> <span class="n">pour</span> <span class="n">les</span> <span class="n">site</span> <span class="n">web</span><span class="p">.</span>
 </code></pre></div>
-
 
 <p><img alt="cert" src="imagesperso/projet06/cert.png"></p>
 <p>Si votre navigateur refuse le format x509, proposez lui du pkcs12</p>
 <div class="highlight"><pre><span></span><code>$ openssl pkcs12 -export -in ca.crt -nokeys -out ca.p12
 </code></pre></div>
-
 
 <p><a href="#sommaire">Revenir en haut de page</a></p>
 <h1>Installation de gitlab en local sur une VM Vagrant <a name="gitlab"></a></h1>
@@ -298,7 +293,6 @@ Il faudra ajouter les lignes suivantes pour faire en sorte que gitlab puisse s'i
   end
 </code></pre></div>
 
-
 <p>Comme vous pouvez le constater dans le Vagrantfile, il faut disposer du fichier GitLab_docker-compose.yml.
 Le voici :</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Nous utilisons la version 3.8 car notre moteur Docker est supérieur à la version 19.03.0+</span>
@@ -328,7 +322,6 @@ services:
     container_name: gitlab-ee
 </code></pre></div>
 
-
 <p>On copie ensuite nos certifcats gitlab.devops.oc.crt / gitlab.devops.oc.key dans la VM gitlab sous /srv/gitlab/config/ssl :</p>
 <div class="highlight"><pre><span></span><code>vagrant@gitlab:/srv/gitlab/config$ sudo mkdir ssl 
 vagrant@gitlab:/srv/gitlab/config$ sudo cp /vagrant/* ssl/ 
@@ -346,7 +339,6 @@ vagrant@gitlab:/srv/gitlab/config/ssl$ <span class="nb">cd</span> /srv/gitlab
 vagrant@gitlab:/srv/gitlab$ sudo mkdir ssl 
 vagrant@gitlab:/srv/gitlab$ sudo cp config/ssl/* ssl/ 
 </code></pre></div>
-
 
 <p><a href="#sommaire">Revenir en haut de page</a></p>
 <h2>docker-compose</h2>
@@ -368,7 +360,6 @@ bb2049c52331: Pull <span class="nb">complete</span>
 2abfb347b972: Pull <span class="nb">complete</span> 
 f85b8ef0c4e3: Extracting <span class="o">[=============</span>&gt;   
 </code></pre></div>
-
 
 <p>Cette installation peut prendre une bonne dizaine de minute. </p>
 <p>Il est possible de suivre les différentes étapes en regardant les logs directement dans le conteneur : </p>
@@ -392,13 +383,11 @@ registry_nginx<span class="o">[</span><span class="s1">&#39;enable&#39;</span><s
 registry_nginx<span class="o">[</span><span class="s1">&#39;listen_port&#39;</span><span class="o">]</span> <span class="o">=</span> <span class="m">5050</span> 
 </code></pre></div>
 
-
 <p>Il faut ensuite relancer la configuration. Pour cela, nous entrons dans le conteneur gitlab puis nous lançons la commande adéquate : </p>
 <div class="highlight"><pre><span></span><code>vagrant@gitlab:~$ docker <span class="nb">exec</span> -ti gitlab-ee bash 
 root@gitlab:/# gitlab-ctl reconfigure 
 root@gitlab:/# gitlab-ctl restart 
 </code></pre></div>
-
 
 <p>L’utilisateur par défaut est root:  </p>
 <p><img alt="gitLab002" src="imagesperso/projet06/gitLab002.png"></p>
@@ -432,7 +421,6 @@ En effet, pour simuler la "vie réelle", nous disposerons au total de 3 environn
   mkdir -p /srv/gitlab-runner/config
 </code></pre></div>
 
-
 <p>Vous l'aurez compris, nous créeons uniquement les volumes qui nous serons utile. Le reste se fera via un docker-compose que je vous présente ici :</p>
 <div class="highlight"><pre><span></span><code>version: <span class="s2">&quot;3.8&quot;</span>
 services: 
@@ -444,7 +432,6 @@ services:
       - <span class="s1">&#39;/var/run/docker.sock:/var/run/docker.sock&#39;</span>
     container_name: gitlab-runner
 </code></pre></div>
-
 
 <p>Le principe est donc le meme que pour l'installation de GitLab.</p>
 <p>Une fois votre environnement crée, connecteé vous en ssh dessus puis lancer la commande suivante (dans notre exemple ci-dessous nous serons sur notre environnement de PréProduction, il faudra faire la meme chose pour l'environnement de Production) :</p>
@@ -464,12 +451,11 @@ Status: Downloaded newer image <span class="k">for</span> gitlab/gitlab-runner:l
 Creating gitlab-runner ... <span class="k">done</span> 
 </code></pre></div>
 
-
 <p>Nous entrons ensuite dans le conteneur gitlab-runner de notre environnement de recette pour lancer l'enregistrement :</p>
 <div class="highlight"><pre><span></span><code>vagrant@recette:/srv/gitlab-runner/config$ docker <span class="nb">exec</span> -ti gitlab-runner bash 
 root@00de709eafcf:/# gitlab-runner register --tls-ca-file<span class="o">=</span>/etc/gitlab-runner/certs/ca.crt 
 Runtime platform                                    <span class="nv">arch</span><span class="o">=</span>amd64 <span class="nv">os</span><span class="o">=</span>linux <span class="nv">pid</span><span class="o">=</span><span class="m">123</span> <span class="nv">revision</span><span class="o">=</span>8fa89735 <span class="nv">version</span><span class="o">=</span><span class="m">13</span>.6.0 
-Running in system-mode.                             
+Running <span class="k">in</span> system-mode.                             
 
 Enter the GitLab instance URL <span class="o">(</span><span class="k">for</span> example, https://gitlab.com/<span class="o">)</span>: 
 https://gitlab.devops.oc/ 
@@ -486,7 +472,6 @@ Enter the default Docker image <span class="o">(</span><span class="k">for</span
 docker:stable 
 Runner registered successfully. Feel free to start it, but <span class="k">if</span> it<span class="err">&#39;</span>s running already the config should be automatically reloaded!  
 </code></pre></div>
-
 
 <p>Faire les modifications suivantes dans le fichier config.toml : </p>
 <div class="highlight"><pre><span></span><code>vagrant@recette:/etc/docker$ sudo vim /srv/gitlab-runner/config/config.toml  
@@ -517,7 +502,6 @@ Runner registered successfully. Feel free to start it, but <span class="k">if</s
 <span class="s2">    shm_size = 0 </span>
 </code></pre></div>
 
-
 <p>Ajouter également (en créant les repertoires) : </p>
 <div class="highlight"><pre><span></span><code>vagrant@recette:~$ <span class="nb">cd</span> /etc/docker 
 vagrant@recette:/etc/docker$ sudo mkdir certs.d 
@@ -530,17 +514,15 @@ vagrant@recette:/etc/docker/certs.d/gitlab.devops.oc$ <span class="nb">cd</span>
 vagrant@recette:/etc/docker/certs.d$ sudo cp -Ra gitlab.devops.oc/ gitlab.devops.oc:
 </code></pre></div>
 
-
 <p>Puis faire un test de connexion à la registery : </p>
 <div class="highlight"><pre><span></span><code>vagrant@recette:/etc/docker$ docker login gitlab.devops.oc:5050 
 Authenticating with existing credentials... 
-WARNING! Your password will be stored unencrypted in /home/vagrant/.docker/config.json. 
+WARNING! Your password will be stored unencrypted <span class="k">in</span> /home/vagrant/.docker/config.json. 
 Configure a credential helper to remove this warning. See 
 https://docs.docker.com/engine/reference/commandline/login/#credentials-store 
 
 Login Succeeded 
 </code></pre></div>
-
 
 <p>Si tout est OK, dans GitLab nous devrions voir désormais notre runner actif :</p>
 <p><img alt="gitLab010" src="imagesperso/projet06/gitLab010.png"></p>
@@ -569,11 +551,9 @@ Other <span class="o">[]</span>:
 Is the information correct? <span class="o">[</span>Y/n<span class="o">]</span> y 
 </code></pre></div>
 
-
 <p>Puis on l’ajoute dans le groupe docker :  </p>
 <div class="highlight"><pre><span></span><code>vagrant@recette:~$ sudo usermod -aG docker deployer 
 </code></pre></div>
-
 
 <p>Cela permet à l’utilisateur “deployer” d’executer les commandes docker qui sont requis pour réaliser le deploiement </p>
 <p>On va ensuite créer une paire de clé privée / public sur notre VM de recette pour l’utilisateur “deployer”. Attention, ne pas mettre de mot de passe car le pipeline execute en mode non interactif les commandes et par conséquent ne pourra pas rentrer le mot de passe : </p>
@@ -581,12 +561,12 @@ Is the information correct? <span class="o">[</span>Y/n<span class="o">]</span> 
 Password: OpenClass 
 deployer@recette:/home/vagrant$ ssh-keygen -b <span class="m">4096</span> 
 Generating public/private rsa key pair. 
-Enter file in which to save the key <span class="o">(</span>/home/deployer/.ssh/id_rsa<span class="o">)</span>:  
+Enter file <span class="k">in</span> which to save the key <span class="o">(</span>/home/deployer/.ssh/id_rsa<span class="o">)</span>:  
 Created directory <span class="s1">&#39;/home/deployer/.ssh&#39;</span>. 
 Enter passphrase <span class="o">(</span>empty <span class="k">for</span> no passphrase<span class="o">)</span>:  
 Enter same passphrase again:  
-Your identification has been saved in /home/deployer/.ssh/id_rsa. 
-Your public key has been saved in /home/deployer/.ssh/id_rsa.pub. 
+Your identification has been saved <span class="k">in</span> /home/deployer/.ssh/id_rsa. 
+Your public key has been saved <span class="k">in</span> /home/deployer/.ssh/id_rsa.pub. 
 The key fingerprint is: 
 SHA256:bks0VGM5japqCIx3/CCrKdbJzRwi9hdQxnRO87qBluI deployer@recette 
 The key<span class="err">&#39;</span>s randomart image is: 
@@ -604,11 +584,9 @@ The key<span class="err">&#39;</span>s randomart image is:
 deployer@recette:/home/vagrant$ 
 </code></pre></div>
 
-
 <p>Pour autoriser cette clé SSH, nous devons ajouter la clé public dans le fichier authorized_keys : </p>
 <div class="highlight"><pre><span></span><code>deployer@recette:/home/vagrant$ cat ~/.ssh/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys 
 </code></pre></div>
-
 
 <p>Enfin, nous allons stocker notre clé privé dans la variable GitLab afin que notre pipeline puisse se loguer sur notre serveur. </p>
 <p>Pour se faire, on navigue dans gitlab dans Settings &gt; CI / CD &gt; Variables puis on clique sur “Add Variable”. Puis renseigner les valeurs suivantes :  </p>
@@ -733,7 +711,6 @@ deployer@recette:/home/vagrant$
   <span class="nt">only</span><span class="p">:</span>
     <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">master</span>
 </code></pre></div>
-
 
 <h2>Déploiement</h2>
 <p>Pour le déploiement en PréProduction, ce dernier est automatique.

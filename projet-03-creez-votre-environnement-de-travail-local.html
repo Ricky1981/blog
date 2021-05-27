@@ -181,31 +181,29 @@ Vagrant se connecte parfaitement via la commande <code>vagrant ssh</code>.
 Cependant, si vous souhaitez utiliser la commande <code>ssh [user]@[IP]</code>, il faudra ajouter des informations dans le fichier ~/.ssh/config.
 Ci-dessous les étapes à respecter : 
 1°/ Nous consultons la configuration ssh de vagrant via la commande <code>vagrant ssh-config</code> :</p>
-<div class="highlight"><pre><span></span><code><span class="err">Host default</span>
-<span class="err">  HostName 127.0.0.1</span>
-<span class="err">  User vagrant</span>
-<span class="err">  Port 2222</span>
-<span class="err">  UserKnownHostsFile /dev/null</span>
-<span class="err">  StrictHostKeyChecking no</span>
-<span class="err">  PasswordAuthentication no</span>
-<span class="err">  IdentityFile /home/seb/.vagrant.d/insecure_private_key</span>
-<span class="err">  IdentitiesOnly yes</span>
-<span class="err">  LogLevel FATAL`</span>
+<div class="highlight"><pre><span></span><code>Host default
+  HostName 127.0.0.1
+  User vagrant
+  Port 2222
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentityFile /home/seb/.vagrant.d/insecure_private_key
+  IdentitiesOnly yes
+  LogLevel FATAL`
 </code></pre></div>
-
 
 <p>2°/ Vagrant nous affiche alors la configuration qu'il utilise. Comme on connait l'adresse IP de la machine et le chemin vers sa clé privée, on peut se rendre dans le fichier <code>~/.ssh/config</code> pour ajouter une configuration :</p>
-<div class="highlight"><pre><span></span><code><span class="err">Host 192.168.33.10</span>
-<span class="err">  User vagrant</span>
-<span class="err">  Port 22</span>
-<span class="err">  UserKnownHostsFile /dev/null</span>
-<span class="err">  StrictHostKeyChecking no</span>
-<span class="err">  PasswordAuthentication no</span>
-<span class="err">  IdentityFile /home/seb/.vagrant.d/insecure_private_key</span>
-<span class="err">  IdentitiesOnly yes</span>
-<span class="err">  LogLevel FATAL</span>
+<div class="highlight"><pre><span></span><code>Host 192.168.33.10
+  User vagrant
+  Port 22
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentityFile /home/seb/.vagrant.d/insecure_private_key
+  IdentitiesOnly yes
+  LogLevel FATAL
 </code></pre></div>
-
 
 <p>La configuration sera ainsi utilisée avec la bonne clé privée et la connexion peut être établie via la commande <code>ssh [user]@[IP]</code></p>
 <h1>Créer vous-même votre environnement <a name="cas2"></a></h1>
@@ -213,10 +211,9 @@ Ci-dessous les étapes à respecter :
 Les prérequis sont les mêmes que pour la <a href="#prerequis">première partie</a> de cette page 
 Pour cela, nous lançons juste la commande suivante afin de générer le fichier “initiale”  </p>
 <div class="highlight"><pre><span></span><code>$ vagrant init 
-A <span class="sb">`</span>Vagrantfile<span class="sb">`</span> has been placed in this directory. You are now ready to <span class="sb">`</span>vagrant up<span class="sb">`</span> your first virtual environment! Please <span class="nb">read</span> the comments in the Vagrantfile as well as documentation on 
+A <span class="sb">`</span>Vagrantfile<span class="sb">`</span> has been placed <span class="k">in</span> this directory. You are now ready to <span class="sb">`</span>vagrant up<span class="sb">`</span> your first virtual environment! Please <span class="nb">read</span> the comments <span class="k">in</span> the Vagrantfile as well as documentation on 
 <span class="sb">`</span>vagrantup.com<span class="sb">`</span> <span class="k">for</span> more information on using Vagrant. 
 </code></pre></div>
-
 
 <h2>Création du Vagrantfile de ma distribution</h2>
 <p>Mon choix s’est porté sur un Debian 10.6.0 en version LXQt Desktop car légère</p>
@@ -233,44 +230,36 @@ Mot de passe :
 root@vagrant-debian10:~# apt-get install ssh sudo 
 </code></pre></div>
 
-
 <p>Nous rajoutons également le package suivant afin de pouvoir ajouter des repository si besoin par la suite (apt-add-repository) car par défaut, n’est pas installé : </p>
 <div class="highlight"><pre><span></span><code>sudo apt-get install software-properties-common 
 </code></pre></div>
-
 
 <p>On va ensuite modifier la configuration du fichier sudoers pour autoriser tous les utilisateurs du groupe admin à sudoer sans mot de passe. </p>
 <div class="highlight"><pre><span></span><code> <span class="c1"># visudo </span>
 </code></pre></div>
 
-
 <p>Nous ajoutons l’utilisateur vagrant :</p>
 <div class="highlight"><pre><span></span><code>vagrant   <span class="nv">ALL</span><span class="o">=(</span>ALL<span class="o">)</span>   NOPASSWD: ALL 
 </code></pre></div>
-
 
 <p>Enfin, on teste notre utilisateur vagrant afin de vérifier que le mot de passe ne soit plus necessaire.  </p>
 <div class="highlight"><pre><span></span><code><span class="c1"># exit </span>
 $ sudo ls 
 </code></pre></div>
 
-
 <p>Ensuite :</p>
 <div class="highlight"><pre><span></span><code>mkdir ~/.ssh 
 $ touch authorized_keys 
 </code></pre></div>
 
-
 <p>Puis ajouter dans authorized_keys la clé publique : </p>
 <div class="highlight"><pre><span></span><code>ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ<span class="o">==</span> vagrant insecure public key 
 </code></pre></div>
-
 
 <p>Puis on donne les bons droits : </p>
 <div class="highlight"><pre><span></span><code>$ chmod <span class="m">0700</span> ~/.ssh 
 $ chmod <span class="m">0600</span> ~/.ssh/authorized_keys 
 </code></pre></div>
-
 
 <p>Il faut aussi installer la VBoxGuestAddition de notre version sinon problème lors du mount (voir https://www.vagrantup.com/docs/providers/virtualbox/boxes.html) </p>
 <div class="highlight"><pre><span></span><code>wget http://download.virtualbox.org/virtualbox/6.1.16/VBoxGuestAdditions_6.1.16.iso  
@@ -282,12 +271,10 @@ sudo umount /media/VBoxGuestAdditions
 sudo rmdir /media/VBoxGuestAdditions 
 </code></pre></div>
 
-
 <p>Si erreur de type : “Kernel header not found for targert kernel 4.19... Please install them and execute /sbin/rcvboxadd setup” 
 Faire :  </p>
 <div class="highlight"><pre><span></span><code>sudo apt-get install build-essential linux-headers-<span class="sb">`</span>uname -r<span class="sb">`</span> dkms 
 </code></pre></div>
-
 
 <p>et on relance le VBoxLinuxAdditons.run 
 Quand tout est OK, on se déconnecte et on éteint la machine. </p>
@@ -297,18 +284,15 @@ Quand tout est OK, on se déconnecte et on éteint la machine. </p>
 <div class="highlight"><pre><span></span><code>$ vagrant package --base vagrant-debian10.6.0 
 </code></pre></div>
 
-
 <p>Le paramètre base est le nom de la VM dans VirtualBox. Un traitement un peu long va se produire et à la fin, vous obtiendrez un fichier package.box. Ce fichier, rangez le dans un endroit accessible à vos futures config vagrant : soit en le laissant dans ce dossier, soit en la mettant sur un serveur http. </p>
 <div class="highlight"><pre><span></span><code>$ vagrant package --base vagrant-debian10.6.0 
 <span class="o">==</span>&gt; vagrant-debian10.6.0: Exporting VM... 
 <span class="o">==</span>&gt; vagrant-debian10.6.0: Compressing package to: /home/seb/Bureau/ownCloud/OpenClassRoom /Projet_03/vagrantBox/ 
 </code></pre></div>
 
-
 <p>On renomme le fichier package.box pour retrouver le nom de notre VM à savoir vagrant-debian10.6.0.box </p>
 <div class="highlight"><pre><span></span><code>$ mv package.box vagrant-debian10.6.0.box 
 </code></pre></div>
-
 
 <h3>Test</h3>
 <p>On modifie le VagrantiFile initial comme suit : </p>
@@ -322,11 +306,9 @@ config.vm.box <span class="o">=</span> <span class="s2">&quot;vagrant-debian10.6
 config.vm.box_url <span class="o">=</span> <span class="s2">&quot;file:///home/seb/Bureau/ownCloud/OpenClassRoom/Projet_03/vagrantBox/vagrant-debian10.6.0.box&quot;</span> 
 </code></pre></div>
 
-
 <p>Et test du vagrant : </p>
 <div class="highlight"><pre><span></span><code>$ vagrant up 
 </code></pre></div>
-
 
 <h1>Notre premier fichier Docker <a name="cas3"></a></h1>
 <h2>Lancement du Dockerfile</h2>
@@ -353,7 +335,6 @@ EXPOSE <span class="m">80</span>
 
 CMD <span class="o">[</span><span class="s2">&quot;nginx&quot;</span>, <span class="s2">&quot;-g&quot;</span>, <span class="s2">&quot;daemon off;&quot;</span><span class="o">]</span>
 </code></pre></div>
-
 
 <h3>Ligne "FROM"</h3>
 <p>Cette ligne nous permet de recuperer l'image debian sur le site <a href="https://hub.docker.com/">DockerHub</a>.
