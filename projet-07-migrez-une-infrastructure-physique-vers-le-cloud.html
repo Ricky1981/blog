@@ -29,7 +29,7 @@
 
 <meta name="author" content="Seb" />
 <meta name="description" content="Migration et amélioration d&#39;un système WordPress dans AWS avec MemCached et CloudFront avec Terraform et Ansible" />
-<meta name="keywords" content="projet, OpenClassRooms, AWS, Terraform, Ansible">
+<meta name="keywords" content="projet, OpenClassRooms, AWS, Terraform, Ansible, Infrastructure-As-Code, WordPress">
 
 
 <meta property="og:site_name" content="Mon Blog Freelance"/>
@@ -47,6 +47,8 @@
 <meta property="article:tag" content="AWS"/>
 <meta property="article:tag" content="Terraform"/>
 <meta property="article:tag" content="Ansible"/>
+<meta property="article:tag" content="Infrastructure-As-Code"/>
+<meta property="article:tag" content="WordPress"/>
 <meta property="og:image" content="">
 
   <title>Mon Blog Freelance &ndash; Projet 07 - Migrez une infrastructure physique vers le Cloud</title>
@@ -56,14 +58,14 @@
   <aside>
     <div>
       <a href="https://ricky1981.github.io/blog">
-        <img src="https://ricky1981.github.io/blog/theme/img/profile.png" alt="Mon Blog Freelance" title="Mon Blog Freelance">
+        <img src="https://ricky1981.github.io/blog/theme/img/profile.png" alt="DevOps Tuto" title="DevOps Tuto">
       </a>
 
       <h1>
-        <a href="https://ricky1981.github.io/blog">Mon Blog Freelance</a>
+        <a href="https://ricky1981.github.io/blog">DevOps Tuto</a>
       </h1>
 
-<p>Le début de ma future aventure DevOps!!!</p>
+<p>Lancez vous dans lautomatisation!!!</p>
 
       <nav>
         <ul class="list">
@@ -160,7 +162,93 @@ ssh-keygen -t ecdsa -f /home/user-ansible/.ssh/id_ecdsa -q -N <span class="s2">&
 <p>Voilà, c'est tout! Tout le reste se fera désormais sur notre VM</p>
 <p><a href="#sommaire">Revenir en haut de page</a></p>
 <h1>Terraform - Création des instances <a name="terraform"></a></h1>
-<p>Une fois connecter en ssh sur votre machine virtuelle, vous pouvez créer un dossier dans lequel vous regrouperez l'ensemble de vos fichiers terraform.</p>
+<p>Une fois connecté en ssh sur votre machine virtuelle, vous pouvez créer un dossier dans lequel vous regrouperez l'ensemble de vos fichiers terraform.</p>
+<p>Avec Terraform, vous pouvez décrire votre stack infrastructure, la variabiliser et la déployer.
+Le seul prérequis : Disposer d’un compte AWS et d’un couple access key - secret key pour accéder aux API d’AWS.</p>
+<p>Dans le projet que je vous propose, les services AWS suivants seront utilisés :</p>
+<ul>
+<li>2 EC2 pour sécuriser notre architecture (un bastion dans un sous-réseau public et une instance dans un sous-réseau privé)</li>
+<li>1 RDS de type MySQL</li>
+<li>CloudFront pour le CDN</li>
+<li>ELB pour le balancing</li>
+<li>Gateway Internet ainsi qu'une Gateway NAT</li>
+<li>MemCached pour le cache mémoire</li>
+<li>Route53 pour le DNS</li>
+<li>Tous les composants necessaire pour le projet (VPC, table de routage, association de la table de routage au sous-reseau, groupe de sécurité, etc.)</li>
+</ul>
+<p>Dans ce projet, nous utiliserons également les "template_file" qui nous permettront de generer les informations necessaire pour la configuration des fichiers hosts de notre bastion ainsi que de notre instance EC2 dans le réseau privé mais également notre paire de clé privée / public sans oublier le minimum pour la configuration de notre wordpress via ansible. En gros, nous allons, via terraform generer un template que ansible utilisera par la suite afin que nous n'ayons strictement rien à faire si ce n'est lancer la commande "terraform apply".</p>
+<p>Bonus : Une fonctionnalité de Terraform est la possibilité de générer un graphique des ressources ainsi que de leurs dépendances. 
+Pour ce faire, lancer les commandes suivantes :</p>
+<div class="highlight"><pre><span></span><code>apt install graphviz
+terraform graph <span class="p">|</span> dot -Tpng &gt; terraform-graph.png
+</code></pre></div>
+
+<h1>Ansible - Création des playbook <a name="ansible"></a></h1>
+<p>Comme indiqué précédemment, tout à été automatisé au maximum dans Terraform. Dans notre cas, Ansible se lance automatiquement une fois toutes les instances créées par terraform. Cela est possible car nous utilisons le paramètre "depends_on" dans la resource terraform.
+Une fois que toutes les dépendances sont respectées, nous pouvons lancer ansible via la commande suivante :</p>
+<div class="highlight"><pre><span></span><code><span class="nv">provisioner</span> <span class="s2">&quot;</span><span class="s">local-exec</span><span class="s2">&quot;</span> {
+    <span class="nv">command</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="s">ansible-playbook --private-key /home/vagrant/terraformsoft/files/key -i /home/vagrant/ansible/inventaire.ini --become --vault-password-file /home/vagrant/ansible/.vault_pass.txt /home/vagrant/ansible/launch.yml</span><span class="s2">&quot;</span>
+  }
+</code></pre></div>
+
+<p>Explication des différentes parties de l'appel de cette commande :</p>
+<ul>
+<li>ansible-playbook [...] /home/vagrant/ansible/launch.yml : ici nous indiquons que nous souhaitons lancer le playbook intitulé "launch.yml". Ce fichier contient les informations suivantes :</li>
+</ul>
+<div class="highlight"><pre><span></span><code>- name: Bastion / Configuration
+  import_playbook: 01-bastion.yml
+
+- name: Nodes / Configuration
+  import_playbook: userNode.yml
+
+- name: Apache / PHP Installation
+  import_playbook: install.yml
+
+- name: Apache / WordPress Configuration
+  import_playbook: conf.yml
+</code></pre></div>
+
+<p>En fait, nous lançons de façon séquentielle les différents playbooks qui sont dans un premier temps lié à notre bastion, puis nos "noeuds" (en l'occurence ici notre instance ec2 qui se trouve dans le sous reseau privé), pour continuer sur une installation de Apache et de PHP sur notre instance ec2 pour enfin finir par une configuration de Apache ainsi que de WordPress.</p>
+<ul>
+<li>--private-key /home/vagrant/terraformsoft/files/key : ici, nous devons utiliser notre clé privée nous permettant de nous connecter sur nos instances EC2 et qui a été generé via Terraform via la ressource suivante :</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">variable</span> <span class="s2">&quot;PrivateKey&quot;</span> <span class="p">{</span>
+  <span class="n">default</span> <span class="o">=</span> <span class="s2">&quot;files/key&quot;</span>
+<span class="p">}</span>
+
+<span class="n">data</span> <span class="s2">&quot;template_file&quot;</span> <span class="s2">&quot;privatekey&quot;</span> <span class="p">{</span>
+  <span class="n">template</span> <span class="o">=</span> <span class="n">file</span><span class="p">(</span><span class="s2">&quot;${path.module}/templates/key&quot;</span><span class="p">)</span>
+
+  <span class="n">vars</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">tls_private_key</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">private_key_pem</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">resource</span> <span class="s2">&quot;null_resource&quot;</span> <span class="s2">&quot;privatekey&quot;</span> <span class="p">{</span>
+  <span class="n">provisioner</span> <span class="s2">&quot;local-exec&quot;</span> <span class="p">{</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="s2">&quot;echo </span><span class="se">\&quot;</span><span class="s2">${data.template_file.privatekey.rendered}</span><span class="se">\&quot;</span><span class="s2"> &gt; ${var.PrivateKey}&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<ul>
+<li>-i /home/vagrant/ansible/inventaire.ini : nous demandons d'utiliser notre fichier d'inventaire qui contient les "hosts" suivants :</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">[jump]</span>
+<span class="na">bastion</span>
+
+<span class="k">[apache]</span>
+<span class="na">ec2</span>
+</code></pre></div>
+
+<ul>
+<li>
+<p>--become : indique que nous faisons une élévation de privilège (sudo)</p>
+</li>
+<li>
+<p>--vault-password-file /home/vagrant/ansible/.vault_pass.txt : Nous utilisons un mot de passe "caché" dans le fichier ".vault_pass.txt" </p>
+</li>
+</ul>
 <p><a href="#sommaire">Revenir en haut de page</a></p>
   </div>
   <div class="tag-cloud">
@@ -170,6 +258,8 @@ ssh-keygen -t ecdsa -f /home/user-ansible/.ssh/id_ecdsa -q -N <span class="s2">&
       <a href="https://ricky1981.github.io/blog/tag/aws.html">AWS</a>
       <a href="https://ricky1981.github.io/blog/tag/terraform.html">Terraform</a>
       <a href="https://ricky1981.github.io/blog/tag/ansible.html">Ansible</a>
+      <a href="https://ricky1981.github.io/blog/tag/infrastructure-as-code.html">Infrastructure-As-Code</a>
+      <a href="https://ricky1981.github.io/blog/tag/wordpress.html">WordPress</a>
     </p>
   </div>
 
