@@ -28,13 +28,13 @@
 
 
 <meta name="author" content="Seb" />
-<meta name="description" content="Migration et amélioration d&#39;un système WordPress dans AWS avec MemCached et CloudFront avec Terraform et Ansible" />
+<meta name="description" content="Automatiation des tests d&#39;une équipe de qualification via Selenium / Jenkins" />
 <meta name="keywords" content="projet, Jenkins, Selenium, Testing, Docker, Prestashop">
 
 
 <meta property="og:site_name" content="Mon Blog Freelance"/>
 <meta property="og:title" content="Projet 06 - Automatisez les tests d&#39;une équipe de qualification"/>
-<meta property="og:description" content="Migration et amélioration d&#39;un système WordPress dans AWS avec MemCached et CloudFront avec Terraform et Ansible"/>
+<meta property="og:description" content="Automatiation des tests d&#39;une équipe de qualification via Selenium / Jenkins"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:url" content="https://ricky1981.github.io/blog/projet-06-automatisez-les-tests-dune-equipe-de-qualification.html"/>
 <meta property="og:type" content="article"/>
@@ -163,15 +163,13 @@ Etant donné qu'une base de donnée est necessaire, nous avons également utilis
 <p>Nous avons utilisé l'option "Headless" sur le serveur pour l'utilisation sans interface utilisateur​</p>
 <ul>
 <li>2 tests sont ici crées :</li>
-<li>
-<p>Test de connexion afin de savoir si le bouton "Connexion" est bien accessible
-  <img alt="Test de connexion" src="imagesperso/projet07_/testco.png"></p>
-</li>
-<li>
-<p>Test de création d'un nouveau compte afin de voir si l'ensemble des champs nécessaires sont disponibles​
-  <img alt="Test de création" src="imagesperso/projet07_/testnewcompte.png"></p>
-</li>
+<li>Test de connexion afin de savoir si le bouton "Connexion" est bien accessible</li>
 </ul>
+<p><img alt="Test de connexion" src="imagesperso/projet07_/testco.png"></p>
+<ul>
+<li>Test de création d'un nouveau compte afin de voir si l'ensemble des champs nécessaires sont disponibles​</li>
+</ul>
+<p><img alt="Test de création" src="imagesperso/projet07_/testnewcompte.png"></p>
 <p>Dans Jenkins, la partie correspondante dans le fichier Jenkinfile est :</p>
 <div class="highlight"><pre><span></span><code><span class="n">stage</span><span class="o">(</span><span class="s1">&#39;Test&#39;</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
 <span class="w">    </span><span class="n">steps</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
