@@ -1,0 +1,250 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://ricky1981.github.io/blog/theme/pygments/github.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/font-awesome/css/solid.css">
+
+
+
+
+
+
+
+<meta name="author" content="Seb" />
+<meta name="description" content="Migration et amélioration d&#39;un système WordPress dans AWS avec MemCached et CloudFront avec Terraform et Ansible" />
+<meta name="keywords" content="projet, Jenkins, Selenium, Testing, Docker, Prestashop">
+
+
+<meta property="og:site_name" content="Mon Blog Freelance"/>
+<meta property="og:title" content="Projet 06 - Automatisez les tests d&#39;une équipe de qualification"/>
+<meta property="og:description" content="Migration et amélioration d&#39;un système WordPress dans AWS avec MemCached et CloudFront avec Terraform et Ansible"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://ricky1981.github.io/blog/projet-06-automatisez-les-tests-dune-equipe-de-qualification.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2022-06-22 00:00:00+02:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://ricky1981.github.io/blog/author/seb.html">
+<meta property="article:section" content="Accueil"/>
+<meta property="article:tag" content="projet"/>
+<meta property="article:tag" content="Jenkins"/>
+<meta property="article:tag" content="Selenium"/>
+<meta property="article:tag" content="Testing"/>
+<meta property="article:tag" content="Docker"/>
+<meta property="article:tag" content="Prestashop"/>
+<meta property="og:image" content="imagesperso/Tech.jpg">
+
+  <title>Mon Blog Freelance &ndash; Projet 06 - Automatisez les tests d&#39;une équipe de qualification</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://ricky1981.github.io/blog">
+        <img src="imagesperso/Tech.jpg" alt="DevOps Tuto" title="DevOps Tuto">
+      </a>
+
+      <h1>
+        <a href="https://ricky1981.github.io/blog">DevOps Tuto</a>
+      </h1>
+
+<p>Lancez vous dans l'automatisation!!!</p>
+
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/Ricky1981" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/sebastien-rykala-7767b81ba/" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://ricky1981.github.io/blog">Home</a>
+
+      <a href="archives.html">Archives</a>
+      <a href="categories.html">Categories</a>
+      <a href="tags.html">Tags</a>
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="projet-06-automatisez-les-tests-dune-equipe-de-qualification">Projet 06 - Automatisez les tests d'une équipe de qualification</h1>
+    <p>
+      Posted on Wed 22 June 2022 in <a href="https://ricky1981.github.io/blog/category/accueil.html">Accueil</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <p>Le poste d'expert DevOps peut exister au sein d'une équipe de développement ou de test. 
+Le but de cet article est de créer des tests automatisés avec l’outil Selenium et Jenkins. </p>
+<p>Pour cela plusieurs étapes seront faites :<br>
+- <a href="#etude">Pre-build</a>
+- <a href="#install">Build</a>
+- <a href="#terraform">Tests</a><br>
+- <a href="#ansible">Visualisation</a>  </p>
+<h1>Etape 1 : Pre-build <a name="etude"></a></h1>
+<p>Jenkins est installé dans notre machine virtuelle, et les outils nécessaires pour faire tourner les tests unitaire dans Prestashop.</p>
+<p>Ces tests sont lancés avec Jenkins.</p>
+<p>Le bon fonctionnement de ces tests signifiera que le projet peut passer en phase “build”.</p>
+<p>Pour se faire, nous installons phpunit via composer puis nous créons une simple fonction dans le repertoire src du projet prestashop :</p>
+<p><img alt="Fonction" src="imagesperso/projet07_/function.png"></p>
+<p>Nous créons ensuite notre test dans le repertoire "test" du projet prestashop :</p>
+<p><img alt="Test" src="imagesperso/projet07_/test.png"></p>
+<p>Enfin, nous utilisons phpunit pour visualiser les tests :</p>
+<p><img alt="PHPUnit" src="imagesperso/projet07_/phpunit.png"></p>
+<p>Dans Jenkins, la partie correspondante dans le fichier Jenkinfile est :</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="n">stage</span><span class="o">(</span><span class="s1">&#39;Pre-Build&#39;</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">steps</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// On lance nos tests unitaires</span><span class="w"></span>
+<span class="w">            </span><span class="n">sh</span><span class="w"> </span><span class="s1">&#39;phpunit tests/&#39;</span><span class="w"></span>
+<span class="w">        </span><span class="o">}</span><span class="w"></span>
+<span class="w">    </span><span class="o">}</span><span class="w"></span>
+</code></pre></div>
+
+<h1>Etape 2 : Build <a name="install"></a></h1>
+<p>Dans ce projet nous avons packagé l’application Prestashop dans un container Docker.
+Etant donné qu'une base de donnée est necessaire, nous avons également utilisé une image mariadb</p>
+<p>Ces deux images ont ensuite été "reliés" via docker-compose où un "bridge network" est utilisé afin que les IPs puissent dialoguer​</p>
+<p><img alt="Dockerfile" src="imagesperso/projet07_/dockerfile.png"></p>
+<p>Dans Jenkins, la partie correspondante dans le fichier Jenkinfile est :</p>
+<div class="highlight"><pre><span></span><code><span class="n">stage</span><span class="o">(</span><span class="s1">&#39;Build&#39;</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">steps</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Grâce à notre fichier dockerfile, nous pouvons construire notre conteneur qui se nommera &quot;prestashopsry&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="n">sh</span><span class="w"> </span><span class="s1">&#39;docker build -t prestashopsry .&#39;</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Nous changeons de repertoire et nous construisons notre deuxième conteneur pour la base de données</span><span class="w"></span>
+<span class="w">        </span><span class="n">dir</span><span class="w"> </span><span class="o">(</span><span class="s1">&#39;package/mariadb/&#39;</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">sh</span><span class="w"> </span><span class="s1">&#39;docker build -t mariadbpresta .&#39;</span><span class="w"></span>
+<span class="w">        </span><span class="o">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">dir</span><span class="w"> </span><span class="o">(</span><span class="s1">&#39;package/&#39;</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// On ajoute le -d pour le mode detached car sinon jenkins ne s&#39;arrete jamais...  </span><span class="w"></span>
+<span class="w">            </span><span class="n">sh</span><span class="w"> </span><span class="s1">&#39;docker-compose up -d&#39;</span><span class="w"></span>
+<span class="w">        </span><span class="o">}</span><span class="w"></span>
+<span class="w">    </span><span class="o">}</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
+</code></pre></div>
+
+<p><a href="#sommaire">Revenir en haut de page</a></p>
+<h1>Etape 3 : Tests <a name="terraform"></a></h1>
+<p>Pour cette dernière étape, nous créons un test fonctionnel avec Selenium.</p>
+<p>Ce test ouvrira une page de Prestashop et lancera automatiquement un test permettant de valider son fonctionnement, et donc que le code fonctionne, et que le build s’est correctement déroulé.</p>
+<p>Dans ce contexte, le test fonctionnel tient lieu de test d’intégration / de validation du build.</p>
+<p>Pour nous aider, nous utilisons l'extension Chrome de Selenium IDE pour la génération des tests afin que nous puissions exporter le code generé en python</p>
+<p>Nous avons utilisé l'option "Headless" sur le serveur pour l'utilisation sans interface utilisateur​</p>
+<ul>
+<li>2 tests sont ici crées :</li>
+<li>
+<p>Test de connexion afin de savoir si le bouton "Connexion" est bien accessible
+  <img alt="Test de connexion" src="imagesperso/projet07_/testco.png"></p>
+</li>
+<li>
+<p>Test de création d'un nouveau compte afin de voir si l'ensemble des champs nécessaires sont disponibles​
+  <img alt="Test de création" src="imagesperso/projet07_/testnewcompte.png"></p>
+</li>
+</ul>
+<p>Dans Jenkins, la partie correspondante dans le fichier Jenkinfile est :</p>
+<div class="highlight"><pre><span></span><code><span class="n">stage</span><span class="o">(</span><span class="s1">&#39;Test&#39;</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">steps</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Ici, nous attendons que la base de données réponde avant de lancer nos tests fonctionnels</span><span class="w"></span>
+<span class="w">        </span><span class="n">sh</span><span class="w"> </span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">            docker exec -i mariadbpresta bash &lt; package/pingmaria.sh</span>
+<span class="s1">            echo &quot;OK on est pas mal&quot;</span>
+<span class="s1">        &#39;&#39;&#39;</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Un timeout pour ne pas être bloqué trop longtemps au cas où...</span><span class="w"></span>
+<span class="w">        </span><span class="n">timeout</span><span class="o">(</span><span class="nl">time:</span><span class="w"> </span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="nl">unit:</span><span class="w"> </span><span class="s1">&#39;MINUTES&#39;</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">            </span><span class="c1">// On lance nos tests que nous exportons au format xml</span><span class="w"></span>
+<span class="w">            </span><span class="n">sh</span><span class="w"> </span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">                pip3 install junit-xml</span>
+<span class="s1">                pytest --junitxml=&quot;report.xml&quot; test_projet08.py</span>
+<span class="s1">            &#39;&#39;&#39;</span><span class="w"></span>
+<span class="w">        </span><span class="o">}</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Nous arretons nos conteneurs</span><span class="w"></span>
+<span class="w">        </span><span class="n">dir</span><span class="w"> </span><span class="o">(</span><span class="s1">&#39;package/&#39;</span><span class="o">)</span><span class="w"> </span><span class="o">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">sh</span><span class="w"> </span><span class="s1">&#39;docker-compose down&#39;</span><span class="w"></span>
+<span class="w">        </span><span class="o">}</span><span class="w"></span>
+<span class="w">    </span><span class="o">}</span><span class="w"></span>
+<span class="o">}</span><span class="w"></span>
+</code></pre></div>
+
+<p><a href="#sommaire">Revenir en haut de page</a></p>
+<h1>Etape 4 : Visualisation <a name="ansible"></a></h1>
+<p>De nombreux modules Jenkins permette de visualiser les résultats des tests.</p>
+<p>Dans notre cas, nous avons utilisé le plugin SeleniumHTMLReport.
+Mais celui de "Open Blue Ocean" n'est pas mal non plus</p>
+<p>Voici une idée d'un DashBoard qu'il sera possible de rendre plus sympathique :</p>
+<p><img alt="DashBoard" src="imagesperso/projet07_/result.png"></p>
+<p>Pour information, voici le Jenkinsfile complet :</p>
+<p><img alt="Jenkinsfile" src="imagesperso/projet07_/Jenkinsfile.png"></p>
+<p><a href="#sommaire">Revenir en haut de page</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://ricky1981.github.io/blog/tag/projet.html">projet</a>
+      <a href="https://ricky1981.github.io/blog/tag/jenkins.html">Jenkins</a>
+      <a href="https://ricky1981.github.io/blog/tag/selenium.html">Selenium</a>
+      <a href="https://ricky1981.github.io/blog/tag/testing.html">Testing</a>
+      <a href="https://ricky1981.github.io/blog/tag/docker.html">Docker</a>
+      <a href="https://ricky1981.github.io/blog/tag/prestashop.html">Prestashop</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>&copy; 2020 Test Copyright</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Mon Blog Freelance ",
+  "url" : "https://ricky1981.github.io/blog",
+  "image": "imagesperso/Tech.jpg",
+  "description": ""
+}
+</script>
+
+
+</body>
+</html>
