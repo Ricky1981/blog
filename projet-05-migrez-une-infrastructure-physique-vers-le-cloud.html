@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/stylesheet/style.min.css">
+
+
+    <link id="pygments-light-theme" rel="stylesheet" type="text/css"
+          href="https://ricky1981.github.io/blog/theme/pygments/github.min.css">
+
+
+  <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/font-awesome/css/fontawesome.css">
+  <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/font-awesome/css/brands.css">
+  <link rel="stylesheet" type="text/css" href="https://ricky1981.github.io/blog/theme/font-awesome/css/solid.css">
+
+
+
+
+
+
+
+<meta name="author" content="Seb" />
+<meta name="description" content="Migration et amélioration d&#39;un système WordPress dans AWS avec MemCached et CloudFront avec Terraform et Ansible" />
+<meta name="keywords" content="projet, AWS, Terraform, Ansible, Infrastructure-As-Code, WordPress">
+
+
+<meta property="og:site_name" content="Mon Blog Freelance"/>
+<meta property="og:title" content="Projet 05 - Migrez une infrastructure physique vers le Cloud"/>
+<meta property="og:description" content="Migration et amélioration d&#39;un système WordPress dans AWS avec MemCached et CloudFront avec Terraform et Ansible"/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:url" content="https://ricky1981.github.io/blog/projet-05-migrez-une-infrastructure-physique-vers-le-cloud.html"/>
+<meta property="og:type" content="article"/>
+<meta property="article:published_time" content="2022-05-27 00:00:00+02:00"/>
+<meta property="article:modified_time" content=""/>
+<meta property="article:author" content="https://ricky1981.github.io/blog/author/seb.html">
+<meta property="article:section" content="Accueil"/>
+<meta property="article:tag" content="projet"/>
+<meta property="article:tag" content="AWS"/>
+<meta property="article:tag" content="Terraform"/>
+<meta property="article:tag" content="Ansible"/>
+<meta property="article:tag" content="Infrastructure-As-Code"/>
+<meta property="article:tag" content="WordPress"/>
+<meta property="og:image" content="imagesperso/Tech.jpg">
+
+  <title>Mon Blog Freelance &ndash; Projet 05 - Migrez une infrastructure physique vers le Cloud</title>
+
+</head>
+<body class="light-theme">
+  <aside>
+    <div>
+      <a href="https://ricky1981.github.io/blog">
+        <img src="imagesperso/Tech.jpg" alt="DevOps Tuto" title="DevOps Tuto">
+      </a>
+
+      <h1>
+        <a href="https://ricky1981.github.io/blog">DevOps Tuto</a>
+      </h1>
+
+<p>Lancez vous dans l'automatisation!!!</p>
+
+
+      <ul class="social">
+          <li>
+            <a  class="sc-github" href="https://github.com/Ricky1981" target="_blank">
+              <i class="fab fa-github"></i>
+            </a>
+          </li>
+          <li>
+            <a  class="sc-linkedin" href="https://www.linkedin.com/in/sebastien-rykala-7767b81ba/" target="_blank">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </li>
+      </ul>
+    </div>
+
+  </aside>
+  <main>
+
+    <nav>
+      <a href="https://ricky1981.github.io/blog">Home</a>
+
+      <a href="archives.html">Archives</a>
+      <a href="categories.html">Categories</a>
+      <a href="tags.html">Tags</a>
+
+
+    </nav>
+
+<article class="single">
+  <header>
+      
+    <h1 id="projet-05-migrez-une-infrastructure-physique-vers-le-cloud">Projet 05 - Migrez une infrastructure physique vers le Cloud</h1>
+    <p>
+      Posted on Fri 27 May 2022 in <a href="https://ricky1981.github.io/blog/category/accueil.html">Accueil</a>
+
+    </p>
+  </header>
+
+
+  <div>
+    <p>Le but de cet article est de montrer les principales étapes d'une mise en place d'un système WordPress dans AWS de façon automatiser.</p>
+<p>Pour cela plusieurs étapes seront faites :<br>
+- <a href="#etude">Schéma d'architecture que nous mettrons en place</a>
+- <a href="#install">Installation de Terraform et Ansible</a>
+- <a href="#terraform">Terraform - Création des instances</a><br>
+- <a href="#ansible">Ansible - Création des playbook</a>  </p>
+<h1>Schéma d'architecture dans AWS <a name="etude"></a></h1>
+<p>Le but ici est de mettre en place l'architecture suivante dans AWS :</p>
+<p><img alt="Schema" src="imagesperso/projet07/schema.png"></p>
+<p>Afin de parvenir à ce schéma, nous allons utiliser Terraform pour créer les instances necessaires dans AWS et Ansible pour l'installation des prérequis et de Wordpress.</p>
+<h1>Installation de Terraform et de Ansible <a name="install"></a></h1>
+<p>Comme à chaque projet, je vais utiliser une machine virtuelle que j'appelerai via Vagrant.
+Dans la partie provision du Vagrantfile, voici les lignes qui nous interessent :</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Ajout depot Ansible</span>
+<span class="nv">LINETOADD_ANSIBLE</span><span class="o">=</span><span class="s1">&#39;deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main&#39;</span>
+<span class="c1"># ici la ligne ne s&#39;ajoutera que si celle ci n&#39;est pas déjà présente dans sources.list</span>
+grep -qFx <span class="s2">&quot;</span><span class="nv">$LINETOADD_ANSIBLE</span><span class="s2">&quot;</span> <span class="s2">&quot;</span><span class="nv">$DEPOTFILE</span><span class="s2">&quot;</span> <span class="o">||</span> <span class="nb">echo</span> <span class="s2">&quot;</span><span class="nv">$LINETOADD_ANSIBLE</span><span class="s2">&quot;</span> &gt;&gt; <span class="s2">&quot;</span><span class="nv">$DEPOTFILE</span><span class="s2">&quot;</span>
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+apt-get update <span class="o">&amp;&amp;</span> apt-get install -y ansible
+
+<span class="c1"># Ajout Terraform</span>
+apt-get install -y curl
+curl -fsSL https://apt.releases.hashicorp.com/gpg <span class="p">|</span> sudo apt-key add -
+apt-add-repository <span class="s2">&quot;deb [arch=amd64] https://apt.releases.hashicorp.com </span><span class="k">$(</span>lsb_release -cs<span class="k">)</span><span class="s2"> main&quot;</span>
+apt-get update <span class="o">&amp;&amp;</span> sudo apt-get install terraform
+</code></pre></div>
+
+<p>Afin de ne pas utiliser un compte disposant de trop de droit, nous pouvons créer un utilisateur "ansible". Cet utilisateur peut être crée via l'ajout des lignes suivantes dans le Vagrantfile :</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Création user-ansible et configuration de ce user</span>
+useradd -m <span class="nv">$user_login</span> -s /bin/bash -p <span class="k">$(</span><span class="nb">echo</span> <span class="nv">$user_passwd</span> <span class="p">|</span> openssl passwd -1 -stdin<span class="k">)</span>
+chown -R user-ansible:user-ansible /home/user-ansible
+<span class="c1"># Création d&#39;une paire de clé qui nous servira pour la connection sur nos instances</span>
+mkdir /home/user-ansible/.ssh/
+ssh-keygen -t ecdsa -f /home/user-ansible/.ssh/id_ecdsa -q -N <span class="s2">&quot;&quot;</span>
+</code></pre></div>
+
+<p>Voilà, c'est tout! Tout le reste se fera désormais sur notre VM</p>
+<p><a href="#sommaire">Revenir en haut de page</a></p>
+<h1>Terraform - Création des instances <a name="terraform"></a></h1>
+<p>Une fois connecté en ssh sur votre machine virtuelle, vous pouvez créer un dossier dans lequel vous regrouperez l'ensemble de vos fichiers terraform.</p>
+<p>Avec Terraform, vous pouvez décrire votre stack infrastructure, la variabiliser et la déployer.
+Le seul prérequis : Disposer d’un compte AWS et d’un couple access key - secret key pour accéder aux API d’AWS.</p>
+<p>Dans le projet que je vous propose, les services AWS suivants seront utilisés :</p>
+<ul>
+<li>2 EC2 pour sécuriser notre architecture (un bastion dans un sous-réseau public et une instance dans un sous-réseau privé)</li>
+<li>1 RDS de type MySQL</li>
+<li>CloudFront pour le CDN</li>
+<li>ELB pour le balancing</li>
+<li>Gateway Internet ainsi qu'une Gateway NAT</li>
+<li>MemCached pour le cache mémoire</li>
+<li>Route53 pour le DNS</li>
+<li>Tous les composants necessaire pour le projet (VPC, table de routage, association de la table de routage au sous-reseau, groupe de sécurité, etc.)</li>
+</ul>
+<p>Dans ce projet, nous utiliserons également les "template_file" qui nous permettront de generer les informations necessaire pour la configuration des fichiers hosts de notre bastion ainsi que de notre instance EC2 dans le réseau privé mais également notre paire de clé privée / public sans oublier le minimum pour la configuration de notre wordpress via ansible. En gros, nous allons, via terraform generer un template que ansible utilisera par la suite afin que nous n'ayons strictement rien à faire si ce n'est lancer la commande "terraform apply".</p>
+<p>Bonus : Une fonctionnalité de Terraform est la possibilité de générer un graphique des ressources ainsi que de leurs dépendances. 
+Pour ce faire, lancer les commandes suivantes :</p>
+<div class="highlight"><pre><span></span><code>apt install graphviz
+terraform graph <span class="p">|</span> dot -Tpng &gt; terraform-graph.png
+</code></pre></div>
+
+<h1>Ansible - Création des playbook <a name="ansible"></a></h1>
+<p>Comme indiqué précédemment, tout à été automatisé au maximum dans Terraform. Dans notre cas, Ansible se lance automatiquement une fois toutes les instances créées par terraform. Cela est possible car nous utilisons le paramètre "depends_on" dans la resource terraform.
+Une fois que toutes les dépendances sont respectées, nous pouvons lancer ansible via la commande suivante :</p>
+<div class="highlight"><pre><span></span><code><span class="nv">provisioner</span><span class="w"> </span><span class="s2">&quot;local-exec&quot;</span><span class="w"> </span>{<span class="w"></span>
+<span class="w">    </span><span class="nv">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;ansible-playbook --private-key /home/vagrant/terraformsoft/files/key -i /home/vagrant/ansible/inventaire.ini --become --vault-password-file /home/vagrant/ansible/.vault_pass.txt /home/vagrant/ansible/launch.yml&quot;</span><span class="w"></span>
+<span class="w">  </span>}<span class="w"></span>
+</code></pre></div>
+
+<p>Explication des différentes parties de l'appel de cette commande :</p>
+<ul>
+<li>ansible-playbook [...] /home/vagrant/ansible/launch.yml : ici nous indiquons que nous souhaitons lancer le playbook intitulé "launch.yml". Ce fichier contient les informations suivantes :</li>
+</ul>
+<div class="highlight"><pre><span></span><code>- name: Bastion / Configuration
+  import_playbook: 01-bastion.yml
+
+- name: Nodes / Configuration
+  import_playbook: userNode.yml
+
+- name: Apache / PHP Installation
+  import_playbook: install.yml
+
+- name: Apache / WordPress Configuration
+  import_playbook: conf.yml
+</code></pre></div>
+
+<p>En fait, nous lançons de façon séquentielle les différents playbooks qui sont dans un premier temps lié à notre bastion, puis nos "noeuds" (en l'occurence ici notre instance ec2 qui se trouve dans le sous reseau privé), pour continuer sur une installation de Apache et de PHP sur notre instance ec2 pour enfin finir par une configuration de Apache ainsi que de WordPress.</p>
+<ul>
+<li>--private-key /home/vagrant/terraformsoft/files/key : ici, nous devons utiliser notre clé privée nous permettant de nous connecter sur nos instances EC2 et qui a été generé via Terraform via la ressource suivante :</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="n">variable</span><span class="w"> </span><span class="s2">&quot;PrivateKey&quot;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;files/key&quot;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="n">data</span><span class="w"> </span><span class="s2">&quot;template_file&quot;</span><span class="w"> </span><span class="s2">&quot;privatekey&quot;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">template</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">file</span><span class="p">(</span><span class="s2">&quot;${path.module}/templates/key&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">vars</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tls_private_key</span><span class="o">.</span><span class="n">ssh</span><span class="o">.</span><span class="n">private_key_pem</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="n">resource</span><span class="w"> </span><span class="s2">&quot;null_resource&quot;</span><span class="w"> </span><span class="s2">&quot;privatekey&quot;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">provisioner</span><span class="w"> </span><span class="s2">&quot;local-exec&quot;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;echo </span><span class="se">\&quot;</span><span class="s2">${data.template_file.privatekey.rendered}</span><span class="se">\&quot;</span><span class="s2"> &gt; ${var.PrivateKey}&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<ul>
+<li>-i /home/vagrant/ansible/inventaire.ini : nous demandons d'utiliser notre fichier d'inventaire qui contient les "hosts" suivants :</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="k">[jump]</span><span class="w"></span>
+<span class="na">bastion</span><span class="w"></span>
+
+<span class="k">[apache]</span><span class="w"></span>
+<span class="na">ec2</span><span class="w"></span>
+</code></pre></div>
+
+<ul>
+<li>
+<p>--become : indique que nous faisons une élévation de privilège (sudo)</p>
+</li>
+<li>
+<p>--vault-password-file /home/vagrant/ansible/.vault_pass.txt : Nous utilisons un mot de passe "caché" dans le fichier ".vault_pass.txt" </p>
+</li>
+</ul>
+<p><a href="#sommaire">Revenir en haut de page</a></p>
+  </div>
+  <div class="tag-cloud">
+    <p>
+      <a href="https://ricky1981.github.io/blog/tag/projet.html">projet</a>
+      <a href="https://ricky1981.github.io/blog/tag/aws.html">AWS</a>
+      <a href="https://ricky1981.github.io/blog/tag/terraform.html">Terraform</a>
+      <a href="https://ricky1981.github.io/blog/tag/ansible.html">Ansible</a>
+      <a href="https://ricky1981.github.io/blog/tag/infrastructure-as-code.html">Infrastructure-As-Code</a>
+      <a href="https://ricky1981.github.io/blog/tag/wordpress.html">WordPress</a>
+    </p>
+  </div>
+
+
+
+
+
+</article>
+
+    <footer>
+<p>&copy; 2020 Test Copyright</p>
+<p>
+Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a href="http://bit.ly/flex-pelican" target="_blank">Flex</a> theme
+</p>    </footer>
+  </main>
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context" : "http://schema.org",
+  "@type" : "Blog",
+  "name": " Mon Blog Freelance ",
+  "url" : "https://ricky1981.github.io/blog",
+  "image": "imagesperso/Tech.jpg",
+  "description": ""
+}
+</script>
+
+
+</body>
+</html>

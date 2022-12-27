@@ -29,56 +29,39 @@
 
 <meta name="author" content="Seb" />
 <meta name="description" content="Lancement de mon site Web" />
-<meta name="keywords" content="projet, OpenClassRooms, CI/CD">
+<meta name="keywords" content="projet, CI/CD">
 
 
 <meta property="og:site_name" content="Mon Blog Freelance"/>
-<meta property="og:title" content="Projet 04 - Mon blog freelance"/>
+<meta property="og:title" content="Projet 02 - Mon blog freelance"/>
 <meta property="og:description" content="Lancement de mon site Web"/>
 <meta property="og:locale" content="en_US"/>
-<meta property="og:url" content="https://ricky1981.github.io/blog/projet-04-mon-blog-freelance.html"/>
+<meta property="og:url" content="https://ricky1981.github.io/blog/projet-02-mon-blog-freelance.html"/>
 <meta property="og:type" content="article"/>
-<meta property="article:published_time" content="2020-12-22 00:00:00+01:00"/>
+<meta property="article:published_time" content="2021-12-11 00:00:00+01:00"/>
 <meta property="article:modified_time" content=""/>
 <meta property="article:author" content="https://ricky1981.github.io/blog/author/seb.html">
 <meta property="article:section" content="Accueil"/>
 <meta property="article:tag" content="projet"/>
-<meta property="article:tag" content="OpenClassRooms"/>
 <meta property="article:tag" content="CI/CD"/>
-<meta property="og:image" content="">
+<meta property="og:image" content="imagesperso/Tech.jpg">
 
-  <title>Mon Blog Freelance &ndash; Projet 04 - Mon blog freelance</title>
+  <title>Mon Blog Freelance &ndash; Projet 02 - Mon blog freelance</title>
 
 </head>
 <body class="light-theme">
   <aside>
     <div>
       <a href="https://ricky1981.github.io/blog">
-        <img src="https://ricky1981.github.io/blog/theme/img/profile.png" alt="Mon Blog Freelance" title="Mon Blog Freelance">
+        <img src="imagesperso/Tech.jpg" alt="DevOps Tuto" title="DevOps Tuto">
       </a>
 
       <h1>
-        <a href="https://ricky1981.github.io/blog">Mon Blog Freelance</a>
+        <a href="https://ricky1981.github.io/blog">DevOps Tuto</a>
       </h1>
 
-<p>Le début de ma future aventure DevOps!!!</p>
+<p>Lancez vous dans l'automatisation!!!</p>
 
-      <nav>
-        <ul class="list">
-
-
-
-            <li>
-              <a target="_self" href="https://getpelican.com/" >Pelican</a>
-            </li>
-            <li>
-              <a target="_self" href="https://docs.gitlab.com/omnibus/docker/" >GitLab Docker</a>
-            </li>
-            <li>
-              <a target="_self" href="https://openclassrooms.com/fr/paths/100/projects/447/assignment" >Projet 04</a>
-            </li>
-        </ul>
-      </nav>
 
       <ul class="social">
           <li>
@@ -110,17 +93,16 @@
 <article class="single">
   <header>
       
-    <h1 id="projet-04-mon-blog-freelance">Projet 04 - Mon blog freelance</h1>
+    <h1 id="projet-02-mon-blog-freelance">Projet 02 - Mon blog freelance</h1>
     <p>
-      Posted on mar. 22 décembre 2020 in <a href="https://ricky1981.github.io/blog/category/accueil.html">Accueil</a>
+      Posted on Sat 11 December 2021 in <a href="https://ricky1981.github.io/blog/category/accueil.html">Accueil</a>
 
     </p>
   </header>
 
 
   <div>
-    <p>Le projet 3 étant terminé, nous pouvons en commencer un autre! 
-Le but? Créer un site statique qui sera automatiquement géré!</p>
+    <p>Le but ici est de créer un site statique qui sera automatiquement géré!</p>
 <p>Bon... presque... Faut-il encore écrire les articles en MarkDown...</p>
 <h1>Table des Matières <a name="sommaire"></a></h1>
 <ol>
@@ -169,7 +151,6 @@ Mais en suivant les étapes suivantes, tout se passera bien :</p>
 <div class="highlight"><pre><span></span><code>openssl req -x509 -out gitlab.devops.oc.crt -keyout gitlab.devops.oc.key -newkey rsa:2048 -nodes -sha256 -subj <span class="s1">&#39;/CN=gitlab.devops.oc&#39;</span> -extensions EXT -config &lt;<span class="o">(</span> <span class="nb">printf</span> <span class="s2">&quot;[dn]\nCN=gitlab.devops.oc\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:gitlab.devops.oc\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth&quot;</span><span class="o">)</span>
 </code></pre></div>
 
-
 <ol>
 <li>Sortir du conteneur puis sur la VM lancer les commandes suivantes :</li>
 </ol>
@@ -179,7 +160,6 @@ vagrant@devops:/srv/gitlab-runner/config/certs$ sudo cp -a gitlab.devops.oc.* /s
 
 vagrant@devops:/srv/gitlab-runner/config/certs$ sudo vim /srv/gitlab/config/gitlab.rb 
 </code></pre></div>
-
 
 <ol>
 <li>Ajouter à la fin du fichier gitlab.rb la commande suivante : <code>registry_external_url 'https://gitlab.devops.oc'</code></li>
@@ -196,7 +176,7 @@ root@00de709eafcf:/# gitlab-runner register
 
 Runtime platform                                    <span class="nv">arch</span><span class="o">=</span>amd64 <span class="nv">os</span><span class="o">=</span>linux <span class="nv">pid</span><span class="o">=</span><span class="m">123</span> <span class="nv">revision</span><span class="o">=</span>8fa89735 <span class="nv">version</span><span class="o">=</span><span class="m">13</span>.6.0 
 
-Running in system-mode.                      
+Running <span class="k">in</span> system-mode.                      
 
 Enter the GitLab instance URL <span class="o">(</span><span class="k">for</span> example, https://gitlab.com/<span class="o">)</span>: https://gitlab.devops.oc/ 
 
@@ -218,7 +198,6 @@ docker:stable
 
 Runner registered successfully. 
 </code></pre></div>
-
 
 <p>Nous pouvons voir le résultat directement sur notre site GitLab dans les paramètres CI/CD, Section "Runner"</p>
 <p><img alt="Runner Image" src="imagesperso/Runner01.png"></p>
@@ -255,7 +234,6 @@ Please answer the following questions so this script can generate the files need
 
 Done. Your new project is available at /home/vagrant/virtualenvs/pelican/freelanceBlog 
 </code></pre></div>
-
 
 <ol>
 <li>Puis nous lançons notre site : <code>pelican --autoreload -b 192.168.33.10 --listen</code></li>
@@ -295,15 +273,14 @@ Pour celà :</p>
 <div class="highlight"><pre><span></span><code>vagrant@devops:~/virtualenvs/pelican/freelanceBlog$ ssh-keygen -t rsa -b <span class="m">4096</span> -C <span class="s2">&quot;Seb&quot;</span>  
 
 Generating public/private rsa key pair. 
-Enter file in which to save the key <span class="o">(</span>/home/vagrant/.ssh/id_rsa<span class="o">)</span>:  
+Enter file <span class="k">in</span> which to save the key <span class="o">(</span>/home/vagrant/.ssh/id_rsa<span class="o">)</span>:  
 Enter passphrase <span class="o">(</span>empty <span class="k">for</span> no passphrase<span class="o">)</span>:  
 Enter same passphrase again:  
-Your identification has been saved in /home/vagrant/.ssh/id_rsa. 
-Your public key has been saved in /home/vagrant/.ssh/id_rsa.pub. 
+Your identification has been saved <span class="k">in</span> /home/vagrant/.ssh/id_rsa. 
+Your public key has been saved <span class="k">in</span> /home/vagrant/.ssh/id_rsa.pub. 
 The key fingerprint is: 
 SHA256:V1Lnvze2GRM1waYUvI4V/mu4v8kD4D11f9LV7RRVCjQ Seb 
 </code></pre></div>
-
 
 <p>Etant donné que nous avons fait une redirection du port SSH dans notre conteneur, il faut le faire comprendre à SSH. </p>
 <p>Pour cela, on crée le fichier ~/.ssh/config et on y renseigne les informations suivantes : </p>
@@ -313,7 +290,6 @@ PreferredAuthentications publickey
 IdentityFile ~/.ssh/id_rsa 
 Port <span class="m">5822</span> 
 </code></pre></div>
-
 
 <p>Ensuite, nous ajoutons notre clé public dans GitLab.
 Quand cela est fait, nous pouvons réaliser le remote sur notre repository et pousser les fichiers que nous souhaitons (penser préalablement au .gitignore)</p>
@@ -375,7 +351,6 @@ Quand cela est fait, nous pouvons réaliser le remote sur notre repository et po
 <span class="nv">DEFAULT_PAGINATION</span> <span class="o">=</span> <span class="m">10</span>
 </code></pre></div>
 
-
 <ol>
 <li>Pour éviter un problème avec l'image du site (Logo OC me concernant), remplacer directement l'image dans /home/vagrant/.local/lib/python3.7/site-packages/pelican/themes/Flex/static/img/profile.png avant de faire un commit.</li>
 </ol>
@@ -383,7 +358,6 @@ Quand cela est fait, nous pouvons réaliser le remote sur notre repository et po
   <div class="tag-cloud">
     <p>
       <a href="https://ricky1981.github.io/blog/tag/projet.html">projet</a>
-      <a href="https://ricky1981.github.io/blog/tag/openclassrooms.html">OpenClassRooms</a>
       <a href="https://ricky1981.github.io/blog/tag/cicd.html">CI/CD</a>
     </p>
   </div>
@@ -410,7 +384,7 @@ Built with <a href="http://getpelican.com" target="_blank">Pelican</a> using <a 
   "@type" : "Blog",
   "name": " Mon Blog Freelance ",
   "url" : "https://ricky1981.github.io/blog",
-  "image": "",
+  "image": "imagesperso/Tech.jpg",
   "description": ""
 }
 </script>
